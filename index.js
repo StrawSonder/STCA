@@ -1,4 +1,3 @@
-
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const {token, prefix} = require('./config.json')
@@ -36,6 +35,16 @@ registration = (message, arr, add) => {
         }
     }
 }
+
+
+client.on('guildMemberAdd', member => {
+    member.guild.channels.get('667773048732254244').send(`Welcome to the STCA, <@` + member.id + `>! If you are a student, head over to #registration !`); 
+});
+
+client.on('guildMemberRemove', member => {
+    member.guild.channels.get('667773048732254244').send(`${member.user.tag} just left the server!`); 
+});
+
 
 client.on('message', message => {
     if (!message.content.startsWith(prefix) || message.author.bot) return;
@@ -155,6 +164,15 @@ client.on('message', message => {
         } else {
             message.channel.send(cannotUse);
         }
+    } else if (command === 'help') {
+        let helpargs = args[0]
+            if (args[0] != 'register') {
+                message.channel.send('Try using !!help register')
+            }
+            else if (args[0] == "register") {
+                message.channel.send("To register as a student, use !!register [TC] [SZ] [RM] [CB]\n"
+                + "ex. !!register C+ B- A S+7")
+            }
     } else {
         message.channel.send("I do not recognize that command!")
     }

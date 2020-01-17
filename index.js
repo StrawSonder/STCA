@@ -134,27 +134,32 @@ client.on('message', message => {
     } else if (command === 'checkin') {
         var teacher = message.guild.roles.find(role => role.name === "Teacher");
         var offline = message.guild.roles.find(role => role.name === "Offline Teacher");
+        var m;
         if (message.member.roles.find("name", "Offline Teacher")) {
-            message.channel.send("You have successfully checked in.")
+            m = message.channel.send("You have successfully checked in.")
             message.member.addRole(teacher);
             message.member.removeRole(offline);
         } else if (message.member.roles.find("name", "Teacher")) {
-            message.channel.send("You are already checked in!");
+            m = message.channel.send("You are already checked in!");
         } else {
-            message.channel.send(cannotUse);
+            m = message.channel.send(cannotUse);
         }
+        message.delete(3000);
+        m.delete(3000);
     } else if (command === 'checkout') {
         var teacher = message.guild.roles.find(role => role.name === "Teacher");
         var offline = message.guild.roles.find(role => role.name === "Offline Teacher");
         if (message.member.roles.find("name", "Teacher")) {
-            message.channel.send("You have successfully checked out.")
+            m = message.channel.send("You have successfully checked out.")
             message.member.addRole(offline);
             message.member.removeRole(teacher);
         } else if (message.member.roles.find("name", "Offline Teacher")) {
-            message.channel.send("You are already checked out!");
+            m = message.channel.send("You are already checked out!");
         } else {
-            message.channel.send(cannotUse);
+            m = message.channel.send(cannotUse);
         }
+        message.delete(3000);
+        m.delete(3000);
     } else {
         message.channel.send("I do not recognize that command!")
     }

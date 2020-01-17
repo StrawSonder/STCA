@@ -107,7 +107,8 @@ client.on('message', message => {
             else if (arr[i] === "X") total += 8;
             
             else if (arr[i] === "S+") {
-                message.channel.send("")
+                message.channel.send("Please add a number after S+.")
+                return;
             }
             else {
                 message.channel.send(rankings);

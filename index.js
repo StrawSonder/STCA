@@ -72,8 +72,6 @@ client.on('message', message => {
         var senior = message.guild.roles.find(role => role.name === "Senior");
         var visitor = message.guild.roles.find(role => role.name === "Visitor");
         var roles = [freshman, sophomore, junior, senior, visitor];
-        var teacher = message.guild.roles.find(role => role.name === "Teacher");
-        var offline = message.guild.roles.find(role => role.name === "Offline Teacher");
         if (args.length == 5) arr = args.slice(1);
         for (var i = 0; i < 4; i++) {
             arr[i] = arr[i].toUpperCase();
@@ -134,6 +132,8 @@ client.on('message', message => {
             + arr[2] + " for rainmaker, and " + arr[3] + " for clam blitz.\n"
             + name + " now a " + roleName + " of the academy!");
     } else if (command === 'checkin') {
+        var teacher = message.guild.roles.find(role => role.name === "Teacher");
+        var offline = message.guild.roles.find(role => role.name === "Offline Teacher");
         if (message.member.roles.find("name", "Offline Teacher")) {
             message.channel.send("You have successfully checked in.")
             message.member.addRole(teacher);
@@ -144,6 +144,8 @@ client.on('message', message => {
             message.channel.send(cannotUse);
         }
     } else if (command === 'checkout') {
+        var teacher = message.guild.roles.find(role => role.name === "Teacher");
+        var offline = message.guild.roles.find(role => role.name === "Offline Teacher");
         if (message.member.roles.find("name", "Teacher")) {
             message.channel.send("You have successfully checked out.")
             message.member.addRole(offline);

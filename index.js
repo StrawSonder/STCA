@@ -2,7 +2,7 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const {token, prefix} = require('./config.json')
-
+var ranks = {};
 
 var express = require('express');
 var app     = express();
@@ -23,8 +23,13 @@ client.on('ready', () => {
 
 client.on('guildMemberAdd', (guildMember) => {
     guildMember.addRole(guildMember.guild.roles.find(role => role.name === "Visitor"));
-    console.log(`${guildMember.user.tag} has gotten the visitor role.`)
+    console.log(`${guildMember.user.tag} has gotten the visitor role.`);
+    member.guild.channels.get('667773048732254244').send(`Welcome to the STCA, <@` + member.id + `>! If you are a student, head over to #registration !`); 
 })
+
+client.on('guildMemberRemove', member => {
+    member.guild.channels.get('667773048732254244').send(`${member.user.tag} just left the server!`); 
+});
 
 //Dealing with registration roles
 registration = (message, arr, add) => {
@@ -65,7 +70,6 @@ client.on('message', message => {
             message.channel.send(rankings);
             return;
         }
-        var total = 0;
         var freshman = message.guild.roles.find(role => role.name === "Freshman");
         var sophomore = message.guild.roles.find(role => role.name === "Sophomore");
         var junior = message.guild.roles.find(role => role.name === "Junior");
@@ -73,54 +77,20 @@ client.on('message', message => {
         var visitor = message.guild.roles.find(role => role.name === "Visitor");
         var roles = [freshman, sophomore, junior, senior, visitor];
         if (args.length == 5) arr = args.slice(1);
-        for (var i = 0; i < 4; i++) {
-            arr[i] = arr[i].toUpperCase();
+        for (var i = 0; i < 4; i++) arr[i] = arr[i].toUpperCase();
+        var rank = new rank(arr[0], arr[1], arr[2], arr[3], message.member.user);
+        if (typeof rank === "string") {
+            message.channel.send(rank);
+            return;
         }
-        for (var i = 0; i < 4; i++) {
-            if (arr[i] === "C-") total += 0.5;
-            else if (arr[i] === "C") total += 1;
-            else if (arr[i] === "C+") total += 1.5;
-
-            else if (arr[i] === "B-") total += 2;
-            else if (arr[i] === "B") total += 2.5;
-            else if (arr[i] === "B+") total += 3;
-
-            else if (arr[i] === "A-") total += 3.5;
-            else if (arr[i] === "A") total += 4;
-            else if (arr[i] === "A+") total += 4.5;
-
-            else if (arr[i] === "S") total += 5;
-
-            else if (arr[i] === "S+0") total += 5.5;
-            else if (arr[i] === "S+1") total += 5.5;
-            else if (arr[i] === "S+2") total += 5.5;
-            else if (arr[i] === "S+3") total += 6;
-            else if (arr[i] === "S+4") total += 6;
-            else if (arr[i] === "S+5") total += 6;
-            else if (arr[i] === "S+6") total += 6.5;
-            else if (arr[i] === "S+7") total += 6.5;
-            else if (arr[i] === "S+8") total += 6.5;
-            else if (arr[i] === "S+9") total += 7;
-
-            else if (arr[i] === "X") total += 8;
-            
-            else if (arr[i] === "S+") {
-                message.channel.send("Please add a number after S+.")
-                return;
-            }
-            else {
-                message.channel.send(rankings);
-                return;
-            }
-        }
-        
-        if (total < 10 ) {
+        ranks.push(rank);
+        if (rank.total < 10 ) {
             roleName = "freshman";
             registration(message, roles, freshman);
-        } else if (total < 20) {
+        } else if (rank.total < 20) {
             roleName = "sophomore";
             registration(message, roles, sophomore);
-        } else if (total < 30) {
+        } else if (rank.total < 30) {
             roleName = "junior";
             registration(message, roles, junior);
         } else {
@@ -134,32 +104,49 @@ client.on('message', message => {
     } else if (command === 'checkin') {
         var teacher = message.guild.roles.find(role => role.name === "Teacher");
         var offline = message.guild.roles.find(role => role.name === "Offline Teacher");
-        var m;
         if (message.member.roles.find("name", "Offline Teacher")) {
-            m = message.channel.send("You have successfully checked in.")
+            message.channel.send("You have successfully checked in.")
             message.member.addRole(teacher);
             message.member.removeRole(offline);
         } else if (message.member.roles.find("name", "Teacher")) {
-            m = message.channel.send("You are already checked in!");
+            message.channel.send("You are already checked in!");
         } else {
-            m = message.channel.send(cannotUse);
+            message.channel.send(cannotUse);
         }
+        message.channel.fetchMessages({ limit: 1 }).then(messages => {
+            let lastMessage = messages.first();
+            if (lastMessage.author.bot) {
+                lastMessage.delete(timeout);
+            }
+        }).catch(console.error);
         message.delete(timeout);
-        m.delete(timeout);
     } else if (command === 'checkout') {
         var teacher = message.guild.roles.find(role => role.name === "Teacher");
         var offline = message.guild.roles.find(role => role.name === "Offline Teacher");
         if (message.member.roles.find("name", "Teacher")) {
-            m = message.channel.send("You have successfully checked out.")
+            message.channel.send("You have successfully checked out.")
             message.member.addRole(offline);
             message.member.removeRole(teacher);
         } else if (message.member.roles.find("name", "Offline Teacher")) {
-            m = message.channel.send("You are already checked out!");
+            message.channel.send("You are already checked out!");
         } else {
-            m = message.channel.send(cannotUse);
+            message.channel.send(cannotUse);
         }
         message.delete(timeout);
-        m.delete(timeout);
+        message.channel.fetchMessages({ limit: 1 }).then(messages => {
+            let lastMessage = messages.first();
+            if (lastMessage.author.bot) {
+                lastMessage.delete(timeout);
+            }
+        }).catch(console.error);
+    } else if (command === "update") {
+        if (args.length != 2) message.channel.send("Incorrect usage! Correct usage is:\n"
+            + "!!update [mode] [rank]\nex. !!update TC S");
+        var ind = ranks.findIndex(rank => rank.id === message.member.id);
+        if (ind == undefined) message.channel.send("You must register first!\n"
+            + "If you have already registered, contact an admin. Data has been deleted.");
+        var str = ranks[ind].set(args[0], args[1]);
+        if (!isEmpty(str)) return str;
     } else {
         message.channel.send("I do not recognize that command!")
     }

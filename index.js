@@ -45,7 +45,7 @@ client.on('message', message => {
     const greeting = "Hello! I am the STCA\'s receptionist.\n";
     const args = message.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
-
+    const timeout = 3000;
     if (command === 'register') {
         var arr, member, name, possessive, roleName;
         if (args.length == 5 && message.member.hasPermission("ADMINISTRATOR")) {
@@ -144,8 +144,8 @@ client.on('message', message => {
         } else {
             m = message.channel.send(cannotUse);
         }
-        message.delete(3000);
-        m.delete(3000);
+        message.delete(timeout);
+        m.delete(timeout);
     } else if (command === 'checkout') {
         var teacher = message.guild.roles.find(role => role.name === "Teacher");
         var offline = message.guild.roles.find(role => role.name === "Offline Teacher");
@@ -158,8 +158,8 @@ client.on('message', message => {
         } else {
             m = message.channel.send(cannotUse);
         }
-        message.delete(3000);
-        m.delete(3000);
+        message.delete(timeout);
+        m.delete(timeout);
     } else {
         message.channel.send("I do not recognize that command!")
     }

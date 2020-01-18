@@ -124,7 +124,7 @@ client.on('message', message => {
         message.channel.send(greeting + possessive + " ranks are "
             + arr[0] + " for tower control, " + arr[1] + " for splat zones, "
             + arr[2] + " for rainmaker, and " + arr[3] + " for clam blitz.\n"
-            + name + " now a " + rank.roleName + " of the academy!");
+            + name + " now a " + rank.role.name + " of the academy!");
     /**
      * checkin command allows offline teachers to check in
      * Offline Teacher is unpingable, while Teacher is pingable

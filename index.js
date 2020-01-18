@@ -119,8 +119,9 @@ client.on('message', message => {
             message.channel.send(rank);
             return;
         }
-        //if valid rank, add it to the array
-        ranks.push(rank);
+        //if valid rank and not reregistration, add it to the array
+        if (ind == -1) ranks.push(rank);
+        else ranks[ind] = rank;
         registration(message, roles, rank.role);
         message.channel.send(greeting + possessive + " ranks are "
             + arr[0] + " for tower control, " + arr[1] + " for splat zones, "

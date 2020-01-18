@@ -2,6 +2,7 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const {token, prefix} = require('./config.json')
+var Rank = require('./Rank.js');
 var ranks = {};
 
 var express = require('express');

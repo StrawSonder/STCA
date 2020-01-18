@@ -1,19 +1,6 @@
 //https://regex101.com/r/OrmORY/1
 
 class Rank {
-    constructor(TC, SZ, RM, CB, message) {
-        this.total = 0;
-        this.roleName = "";
-        this.role;
-        var str = calcTotal(TZ, SZ, RM, CB);
-        if (!isEmpty(str)) return str;
-        this.TC = TC;
-        this.SZ = SZ;
-        this.RM = RM;
-        this.CB = CB;
-        this.id = message.member.id;
-        getYear();
-    }
     calcTotal(TC, SZ, RM, CB) {
         var arr = [TC, SZ, RM, CB];
         total = 0;
@@ -95,6 +82,19 @@ class Rank {
         else return "Invalid mode.";
         calcTotal2();
         return "";
+    }
+    constructor(TC, SZ, RM, CB, message) {
+        this.total = 0;
+        this.roleName = "";
+        this.role;
+        var str = calcTotal(TZ, SZ, RM, CB);
+        if (!isEmpty(str)) return str;
+        this.TC = TC;
+        this.SZ = SZ;
+        this.RM = RM;
+        this.CB = CB;
+        this.id = message.member.id;
+        getYear();
     }
 }
 

@@ -67,6 +67,7 @@ getYear = (total, message) => {
     var sophomore = message.guild.roles.find(role => role.name === "Sophomore");
     var junior = message.guild.roles.find(role => role.name === "Junior");
     var senior = message.guild.roles.find(role => role.name === "Senior");
+    var role;
     if (total < 10 ) role = freshman;
     else if (total < 20) role = sophomore;
     else if (total < 30) role = junior;

@@ -112,6 +112,7 @@ client.on('message', message => {
         for (var i = 0; i < 4; i++) arr[i] = arr[i].toUpperCase();
         //rank variable contains info about the ranks and the user that the ranks are associated with
         var rank = new Rank(arr[0], arr[1], arr[2], arr[3], message);
+        var ind = ranks.findIndex(rank => rank.message.member.id == message.member.id);
         //in general, errors are indicated by the method returning a string associated with that error
         //instead of the object or primitive it was supposed to return
         if (typeof rank === "string") {
@@ -170,9 +171,12 @@ client.on('message', message => {
         if (args.length != 2) message.channel.send("Incorrect usage! Correct usage is:\n"
             + "!!update [mode] [rank]\nex. !!update TC S");
         //finds the rank object associated with the user
-        var ind = ranks.findIndex(rank => rank.message.member.id === message.member.id);
-        if (ind == undefined) message.channel.send("You must register first!\n"
-            + "If you had previously registered and are getting this error, ping @Straw or @leonidasxlii.");
+        var ind = ranks.findIndex(rank => rank.message.member.id == message.member.id);
+        if (ind == -1) {
+            message.channel.send("You must register first!\n"
+                + "If you had previously registered and are getting this error, ping @Straw or @leonidasxlii.");
+            return;
+        }
         //sets the specific rank
         var str = ranks[ind].set(args[0], args[1]);
         if (typeof str === "string") return str;

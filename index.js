@@ -5,7 +5,7 @@ const {token, prefix} = require('./config.json')
 //Adding Rank class and methods
 var Rank = require('./Rank.js');
 //Array for saving ranks
-var ranks = {};
+var ranks = [];
 
 var express = require('express');
 var app = express();

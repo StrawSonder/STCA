@@ -1,17 +1,18 @@
 //https://regex101.com/r/OrmORY/1
 
 class Rank {
-    constructor(TC, SZ, RM, CB, id) {
+    constructor(TC, SZ, RM, CB, message) {
         this.total = 0;
+        this.roleName = "";
+        this.role;
         var str = calcTotal(TZ, SZ, RM, CB);
-        if (!isEmpty(str)) {
-            return str;
-        }
+        if (!isEmpty(str)) return str;
         this.TC = TC;
         this.SZ = SZ;
         this.RM = RM;
         this.CB = CB;
-        this.id = id;
+        this.id = message.member.id;
+        getYear();
     }
     calcTotal(TC, SZ, RM, CB) {
         var arr = [TC, SZ, RM, CB];
@@ -23,6 +24,10 @@ class Rank {
             }
         }
         return "";
+    }
+    
+    calcTotal() {
+        return calcTotal(TC, SZ, RM, CB);
     }
 
     checkRank(rank) {
@@ -59,6 +64,26 @@ class Rank {
         return "";
     }
 
+    getYear() {
+        var freshman = message.guild.roles.find(role => role.name === "Freshman");
+        var sophomore = message.guild.roles.find(role => role.name === "Sophomore");
+        var junior = message.guild.roles.find(role => role.name === "Junior");
+        var senior = message.guild.roles.find(role => role.name === "Senior");
+        if (total < 10 ) {
+            roleName = "freshman";
+            role = freshman;
+        } else if (total < 20) {
+            roleName = "sophomore";
+            role = sophomore;
+        } else if (total < 30) {
+            roleName = "junior";
+            role = junior;
+        } else {
+            roleName = "senior";
+            role = senior;
+        }
+    }
+
     set(mode, rank) {
         mode = mode.toUpperCase();
         var str = checkRank(rank);
@@ -68,44 +93,7 @@ class Rank {
         else if (mode === "RM") RM = rank;
         else if (mode === "CB") CB = rank;
         else return "Invalid mode.";
+        calcTotal();
         return "";
-    }
-
-    /*setTC(TC) {
-        var str = checkRank(TC);
-        this.TC = TC;
-        calcTotal();
-    }
-
-    setTC(SZ) {
-        this.SZ = SZ;
-        calcTotal();
-    }
-
-    setRM(RM) {
-        this.RM = RM;
-        calcTotal();
-    }
-
-    setCB(CB) {
-        this.CB = CB;
-        calcTotal();
-    }
-    */
-
-    getTC(TC) {
-        return TC;
-    }
-
-    getTC(SZ) {
-        return TC;
-    }
-
-    getRM(RM) {
-        return TC;
-    }
-
-    getCB(CB) {
-        return TC;
     }
 }

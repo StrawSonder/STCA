@@ -51,6 +51,15 @@ client.on('message', message => {
     const args = message.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
     const timeout = 3000;
+    var freshman = message.guild.roles.find(role => role.name === "Freshman");
+    var sophomore = message.guild.roles.find(role => role.name === "Sophomore");
+    var junior = message.guild.roles.find(role => role.name === "Junior");
+    var senior = message.guild.roles.find(role => role.name === "Senior");
+    var visitor = message.guild.roles.find(role => role.name === "Visitor");
+    var roles = [freshman, sophomore, junior, senior, visitor];
+    var teacher = message.guild.roles.find(role => role.name === "Teacher");
+    var offline = message.guild.roles.find(role => role.name === "Offline Teacher");
+
     if (command === 'register') {
         var arr, member, name, possessive, roleName;
         if (args.length == 5 && message.member.hasPermission("ADMINISTRATOR")) {
@@ -70,40 +79,21 @@ client.on('message', message => {
             message.channel.send(rankings);
             return;
         }
-        var freshman = message.guild.roles.find(role => role.name === "Freshman");
-        var sophomore = message.guild.roles.find(role => role.name === "Sophomore");
-        var junior = message.guild.roles.find(role => role.name === "Junior");
-        var senior = message.guild.roles.find(role => role.name === "Senior");
-        var visitor = message.guild.roles.find(role => role.name === "Visitor");
-        var roles = [freshman, sophomore, junior, senior, visitor];
+        
         if (args.length == 5) arr = args.slice(1);
         for (var i = 0; i < 4; i++) arr[i] = arr[i].toUpperCase();
-        var rank = new rank(arr[0], arr[1], arr[2], arr[3], message.member.user);
+        var rank = new rank(arr[0], arr[1], arr[2], arr[3], message);
         if (typeof rank === "string") {
             message.channel.send(rank);
             return;
         }
         ranks.push(rank);
-        if (rank.total < 10 ) {
-            roleName = "freshman";
-            registration(message, roles, freshman);
-        } else if (rank.total < 20) {
-            roleName = "sophomore";
-            registration(message, roles, sophomore);
-        } else if (rank.total < 30) {
-            roleName = "junior";
-            registration(message, roles, junior);
-        } else {
-            roleName = "senior";
-            registration(message, roles, senior)
-        }
+        registration(message, roles, rank.role);
         message.channel.send(greeting + possessive + " ranks are "
             + arr[0] + " for tower control, " + arr[1] + " for splat zones, "
             + arr[2] + " for rainmaker, and " + arr[3] + " for clam blitz.\n"
-            + name + " now a " + roleName + " of the academy!");
+            + name + " now a " + rank.roleName + " of the academy!");
     } else if (command === 'checkin') {
-        var teacher = message.guild.roles.find(role => role.name === "Teacher");
-        var offline = message.guild.roles.find(role => role.name === "Offline Teacher");
         if (message.member.roles.find("name", "Offline Teacher")) {
             message.channel.send("You have successfully checked in.")
             message.member.addRole(teacher);
@@ -121,8 +111,6 @@ client.on('message', message => {
         }).catch(console.error);
         message.delete(timeout);
     } else if (command === 'checkout') {
-        var teacher = message.guild.roles.find(role => role.name === "Teacher");
-        var offline = message.guild.roles.find(role => role.name === "Offline Teacher");
         if (message.member.roles.find("name", "Teacher")) {
             message.channel.send("You have successfully checked out.")
             message.member.addRole(offline);
@@ -147,8 +135,17 @@ client.on('message', message => {
             + "If you have already registered, contact an admin. Data has been deleted.");
         var str = ranks[ind].set(args[0], args[1]);
         if (!isEmpty(str)) return str;
+        var old = ranks[ind].roleName;
+        ranks[ind].getYear();
+        var add = "";
+        if (old !== ranks[ind].roleName) {
+            add = "\nYou are now a " + ranks[ind].roleName + "! Congratulations!";
+            registration(message, roles, rank.role);
+        }
+        message.channel.send(greeting + "Your " + args[0] + " rank is now " + args[1]
+            + "." + add);
     } else {
-        message.channel.send("I do not recognize that command!")
+        message.channel.send("I do not recognize that command!");
     }
 })
 

@@ -62,7 +62,7 @@ checkRank = (rank) => {
  * @param total the total to be used for calculation
  * @return role the role that should be given to the user that has that total
  */
-getYear = (total) => {
+getYear = (total, message) => {
     var freshman = message.guild.roles.find(role => role.name === "Freshman");
     var sophomore = message.guild.roles.find(role => role.name === "Sophomore");
     var junior = message.guild.roles.find(role => role.name === "Junior");
@@ -78,7 +78,7 @@ getYear = (total) => {
  * Rank object contains information about the ranks for the modes of the user as well as the user id
  */
 class Rank {
-    
+
     /**
      * Instantiates a rank object, except when there is an error
      * @param {tower control} TC 
@@ -92,12 +92,12 @@ class Rank {
         var str = calcTotal(TC, SZ, RM, CB);
         if (typeof str === "string") return str;
         else this.total = str;
-        this.role = getYear(this.total);
+        this.role = getYear(this.total, message);
         this.TC = TC;
         this.SZ = SZ;
         this.RM = RM;
         this.CB = CB;
-        this.id = message.member.id;
+        this.message = message;
     }
     
     /**
@@ -115,7 +115,7 @@ class Rank {
      * Sets the class of the student (freshman, sophomore, etc.)
      */
     setYear() {
-        role = getYear(total);
+        role = getYear(total, message);
     }
 
     /**

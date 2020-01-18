@@ -169,8 +169,11 @@ client.on('message', message => {
      * Updates one rank at a time for students that have already registered
      */
     } else if (command === "update") {
-        if (args.length != 2) message.channel.send("Incorrect usage! Correct usage is:\n"
-            + "!!update [mode] [rank]\nex. !!update TC S");
+        if (args.length != 2) {
+            message.channel.send("Incorrect usage! Correct usage is:\n"
+                + "!!update [mode] [rank]\nex. !!update TC S");
+            return;
+        }
         //finds the rank object associated with the user
         var ind = ranks.findIndex(rank => rank.message.member.id == message.member.id);
         if (ind == -1) {
@@ -179,7 +182,7 @@ client.on('message', message => {
             return;
         }
         //sets the specific rank
-        var str = set(args[0], args[1]);
+        var str = set(args[0], args[1], ranks[ind]);
         if (typeof str === "string") return str;
         ranks[ind] = str;
         var old = ranks[ind].role;

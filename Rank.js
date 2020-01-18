@@ -75,6 +75,25 @@ getYear = (total, message) => {
 }
 
 /**
+ * Sets a specific mode's rank using user's data from ranks array
+ * @param {Mode that user is setting} mode 
+ * @param {Rank to be setting the mode's rank to} rank 
+ */
+set(mode, rankName, rank) {
+    mode = mode.toUpperCase();
+    rankName = rankName.toUpperCase();
+    var str = checkRank(rankName);
+    if (typeof str === "string") return str;
+    if (mode === "TC") rank.TC = rank; 
+    else if (mode === "SZ") rank.SZ = rank;
+    else if (mode === "RM") rank.RM = rank;
+    else if (mode === "CB") rank.CB = rank;
+    else return "Invalid mode.";
+    rank.setTotal();
+    return rank;
+}
+
+/**
  * Rank object contains information about the ranks for the modes of the user as well as the user id
  */
 class Rank {
@@ -116,25 +135,6 @@ class Rank {
      */
     setYear() {
         role = getYear(total, message);
-    }
-
-    /**
-     * Sets a specific mode's rank using user's data from ranks array
-     * @param {Mode that user is setting} mode 
-     * @param {Rank to be setting the mode's rank to} rank 
-     */
-    set(mode, rank) {
-        mode = mode.toUpperCase();
-        rank = rank.toUpperCase();
-        var str = checkRank(rank);
-        if (typeof str === "string") return str;
-        if (mode === "TC") TC = rank; 
-        else if (mode === "SZ") SZ = rank;
-        else if (mode === "RM") RM = rank;
-        else if (mode === "CB") CB = rank;
-        else return "Invalid mode.";
-        setTotal();
-        return total;
     }
 }
 

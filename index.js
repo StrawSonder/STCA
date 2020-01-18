@@ -179,8 +179,9 @@ client.on('message', message => {
             return;
         }
         //sets the specific rank
-        var str = ranks[ind].set(args[0], args[1]);
+        var str = set(args[0], args[1]);
         if (typeof str === "string") return str;
+        ranks[ind] = str;
         var old = ranks[ind].role;
         ranks[ind].setYear();
         var add = "";

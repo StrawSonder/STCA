@@ -173,7 +173,40 @@ client.on('message', message => {
                 message.channel.send("To register as a student, use !!register [TC] [SZ] [RM] [CB]\n"
                 + "ex. !!register C+ B- A S+7")
             }
-    } else {
+    }else if (command === 'lfg') {
+        var lfg = message.guild.roles.find(role => role.name === "LFG");
+        if (!message.member.roles.find("name", "LFG")) {
+            message.channel.send("You now have the LFG role!")
+            message.member.addRole(lfg)
+        }
+        else if (message.member.roles.find("name", "LFG")) {
+            message.channel.send("You have removed the LFG role!")
+            message.member.removeRole(lfg)
+        }
+
+    } else if (command === 'na') {
+        var na = message.guild.roles.find(role => role.name === "NA");
+        if (!message.member.roles.find("name", "NA")) {
+            message.channel.send("You now have the NA role!")
+            message.member.addRole(na)
+        }
+        else if (message.member.roles.find("name", "NA")) {
+            message.channel.send("You have removed the NA role!")
+            message.member.removeRole(na)
+        }
+
+    } else if (command === 'eu') {
+        var eu = message.guild.roles.find(role => role.name === "EU");
+        if (!message.member.roles.find("name", "EU")) {
+            message.channel.send("You now have the EU role!")
+            message.member.addRole(eu)
+        }
+        else if (message.member.roles.find("name", "EU")) {
+            message.channel.send("You have removed the EU role!")
+            message.member.removeRole(eu)
+        }
+
+    }else {
         message.channel.send("I do not recognize that command!")
     }
 })

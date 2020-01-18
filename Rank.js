@@ -79,7 +79,7 @@ getYear = (total, message) => {
  * @param {Mode that user is setting} mode 
  * @param {Rank to be setting the mode's rank to} rank 
  */
-set(mode, rankName, rank) {
+set = (mode, rankName, rank) => {
     mode = mode.toUpperCase();
     rankName = rankName.toUpperCase();
     var str = checkRank(rankName);

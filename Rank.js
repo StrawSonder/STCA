@@ -26,7 +26,7 @@ class Rank {
         return "";
     }
     
-    calcTotal() {
+    calcTotal2() {
         return calcTotal(TC, SZ, RM, CB);
     }
 
@@ -93,7 +93,9 @@ class Rank {
         else if (mode === "RM") RM = rank;
         else if (mode === "CB") CB = rank;
         else return "Invalid mode.";
-        calcTotal();
+        calcTotal2();
         return "";
     }
 }
+
+module.exports = Rank;

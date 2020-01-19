@@ -140,8 +140,6 @@ client.on('message', message => {
             + arr[2] + " for rainmaker, and " + arr[3] + " for clam blitz.\n"
             + name + " now a " + roleName + " of the academy!");
     } else if (command === 'checkin') {
-        var teacher = message.guild.roles.find(role => role.name === "Teacher");
-        var offline = message.guild.roles.find(role => role.name === "Offline Teacher");
         if (message.member.roles.find("name", "Offline Teacher")) {
             message.channel.send("You have successfully checked in.")
             message.member.addRole(teacher);
@@ -151,9 +149,14 @@ client.on('message', message => {
         } else {
             message.channel.send(cannotUse);
         }
+        message.channel.fetchMessages({ limit: 1 }).then(messages => {
+            let lastMessage = messages.first();
+            if (lastMessage.author.bot) {
+                lastMessage.delete(timeout);
+            }
+        }).catch(console.error);
+        message.delete(timeout);
     } else if (command === 'checkout') {
-        var teacher = message.guild.roles.find(role => role.name === "Teacher");
-        var offline = message.guild.roles.find(role => role.name === "Offline Teacher");
         if (message.member.roles.find("name", "Teacher")) {
             message.channel.send("You have successfully checked out.")
             message.member.addRole(offline);
@@ -163,6 +166,16 @@ client.on('message', message => {
         } else {
             message.channel.send(cannotUse);
         }
+        message.delete(timeout);
+        message.channel.fetchMessages({ limit: 1 }).then(messages => {
+            let lastMessage = messages.first();
+            if (lastMessage.author.bot) {
+                lastMessage.delete(timeout);
+            }
+        }).catch(console.error);
+    /**
+     * Updates one rank at a time for students that have already registered
+     */
     } else if (command === 'help') {
         let helpargs = args[0]
             if (args[0] == undefined) {
@@ -178,24 +191,24 @@ client.on('message', message => {
                 "SW (Stands for 'Stream Watcher,' for if you would like to watch peoples' streams!)")
             }
     }else if (command === 'role') {
-        args[0] = args[0].toUpperCase();
-        var role = message.guild.roles.find(role => role.name === args[0])
-
-        if (args[0] == undefined) {
+        if (args.length != 1){
             message.channel.send("Please type the role you would like to add or remove!")
-        } else if (role == undefined) {
-            message.channel.send("That is not a role!")
-        } else if (args[0] != "SW" && "LFG" && "NA" && "EU") {
-            message.channel.send("I'm sorry! You cannot use that role!")
-        } else if (role != undefined) {
+            return;
+        } 
+            
+        var role = message.guild.roles.find(role => role.name === args[0].toUpperCase())
+        if (role != undefined) {
             if (message.member.roles.find("name", role.name)) {
                 message.member.removeRole(role);
                 message.channel.send(`Successfully removed the role ${role.name}!`)
-            }
-            else if (!message.member.roles.find("name", role.name)) {
+            } else {
                 message.member.addRole(role);
                 message.channel.send(`Successfully added the role ${role.name}!`)
-            }
+            } 
+        } else if (args[0] != "SW" && "LFG" && "NA" && "EU") {
+            message.channel.send("I'm sorry! You cannot use that role!")
+        } else {
+            message.channel.send("That is not a role!")
         }
 
     } else {

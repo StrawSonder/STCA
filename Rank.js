@@ -90,7 +90,26 @@ set = (mode, rankName, rank) => {
     else if (mode === "RM") rank.RM = rank;
     else if (mode === "CB") rank.CB = rank;
     else return "Invalid mode.";
-    rank.setTotal();
+    rank = setTotal(rank);
+    return rank;
+}
+
+/**
+ * Sets the total if there is no error
+ * @return total if no error, str if error
+ */
+setTotal = (rank) => {
+    var str = calcTotal(rank.TC, rank.SZ, rank.RM, rank.CB);
+    if (typeof str === "string") return str;
+    rank.total = str;
+    return rank;
+}
+
+/**
+ * Sets the class of the student (freshman, sophomore, etc.)
+ */
+setYear = (rank) => {
+    rank.role = getYear(rank.total, rank.message);
     return rank;
 }
 
@@ -98,7 +117,6 @@ set = (mode, rankName, rank) => {
  * Rank object contains information about the ranks for the modes of the user as well as the user id
  */
 class Rank {
-
     /**
      * Instantiates a rank object, except when there is an error
      * @param {tower control} TC 
@@ -118,24 +136,6 @@ class Rank {
         this.RM = RM;
         this.CB = CB;
         this.message = message;
-    }
-    
-    /**
-     * Sets the total if there is no error
-     * @return total if no error, str if error
-     */
-    setTotal() {
-        var str = calcTotal(TC, SZ, RM, CB);
-        if (typeof str === "string") return str;
-        total = str;
-        return str;
-    }
-
-    /**
-     * Sets the class of the student (freshman, sophomore, etc.)
-     */
-    setYear() {
-        role = getYear(total, message);
     }
 }
 

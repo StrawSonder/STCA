@@ -186,7 +186,7 @@ client.on('message', message => {
         if (typeof str === "string") return str;
         ranks[ind] = str;
         var old = ranks[ind].role;
-        ranks[ind].setYear();
+        ranks[ind] = setYear(ranks[ind]);
         var add = "";
         //checks if user should have changed a class
         if (old !== ranks[ind].role) {

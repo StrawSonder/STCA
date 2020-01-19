@@ -36,7 +36,6 @@ registration = (message, arr, add) => {
     }
 }
 
-
 client.on('guildMemberAdd', member => {
     member.guild.channels.get('667773048732254244').send(`Welcome to the STCA, <@` + member.id + `>! If you are a student, head over to #registration !`); 
 });
@@ -166,47 +165,40 @@ client.on('message', message => {
         }
     } else if (command === 'help') {
         let helpargs = args[0]
-            if (args[0] != 'register') {
-                message.channel.send('Try using !!help register')
-            }
-            else if (args[0] == "register") {
+            if (args[0] == undefined) {
+                message.channel.send('If you are a student and would like to register, use !!register\n If you would like to add a role, use !!role\n If you do not know how to use these commands, use !!help (command)')
+            } else if (args[0] == "register") {
                 message.channel.send("To register as a student, use !!register [TC] [SZ] [RM] [CB]\n"
                 + "ex. !!register C+ B- A S+7")
+            } else if (args[0] == "role") {
+                message.channel.send("To add or remove a role, use !!role\n\nHere are the roles you can choose from:\n" +
+                "LFG (If you are interested in being pinged for people looking for game)\n" +
+                "NA (If you are in the NA timezone)\n" +
+                "EU (If you are in the EU timezone)\n" +
+                "SW (Stands for 'Stream Watcher,' for if you would like to watch peoples' streams!)")
             }
-    }else if (command === 'lfg') {
-        var lfg = message.guild.roles.find(role => role.name === "LFG");
-        if (!message.member.roles.find("name", "LFG")) {
-            message.channel.send("You now have the LFG role!")
-            message.member.addRole(lfg)
-        }
-        else if (message.member.roles.find("name", "LFG")) {
-            message.channel.send("You have removed the LFG role!")
-            message.member.removeRole(lfg)
+    }else if (command === 'role') {
+        args[0] = args[0].toUpperCase();
+        var role = message.guild.roles.find(role => role.name === args[0])
+
+        if (args[0] == undefined) {
+            message.channel.send("Please type the role you would like to add or remove!")
+        } else if (role == undefined) {
+            message.channel.send("That is not a role!")
+        } else if (args[0] != "SW" && "LFG" && "NA" && "EU") {
+            message.channel.send("I'm sorry! You cannot use that role!")
+        } else if (role != undefined) {
+            if (message.member.roles.find("name", role.name)) {
+                message.member.removeRole(role);
+                message.channel.send(`Successfully removed the role ${role.name}!`)
+            }
+            else if (!message.member.roles.find("name", role.name)) {
+                message.member.addRole(role);
+                message.channel.send(`Successfully added the role ${role.name}!`)
+            }
         }
 
-    } else if (command === 'na') {
-        var na = message.guild.roles.find(role => role.name === "NA");
-        if (!message.member.roles.find("name", "NA")) {
-            message.channel.send("You now have the NA role!")
-            message.member.addRole(na)
-        }
-        else if (message.member.roles.find("name", "NA")) {
-            message.channel.send("You have removed the NA role!")
-            message.member.removeRole(na)
-        }
-
-    } else if (command === 'eu') {
-        var eu = message.guild.roles.find(role => role.name === "EU");
-        if (!message.member.roles.find("name", "EU")) {
-            message.channel.send("You now have the EU role!")
-            message.member.addRole(eu)
-        }
-        else if (message.member.roles.find("name", "EU")) {
-            message.channel.send("You have removed the EU role!")
-            message.member.removeRole(eu)
-        }
-
-    }else {
+    } else {
         message.channel.send("I do not recognize that command!")
     }
 })

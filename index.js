@@ -197,6 +197,41 @@ client.on('message', message => {
             registration(message, roles, rank.role);
         }
         message.channel.send(greeting + "Your " + args[0] + " rank is now " + args[1] + "." + add);
+    } else if (command === 'help') {
+        let helpargs = args[0]
+            if (args[0] == undefined) {
+                message.channel.send('If you are a student and would like to register, use !!register\n If you would like to add a role, use !!role\n If you do not know how to use these commands, use !!help (command)')
+            } else if (args[0] == "register") {
+                message.channel.send("To register as a student, use !!register [TC] [SZ] [RM] [CB]\n"
+                + "ex. !!register C+ B- A S+7")
+            } else if (args[0] == "role") {
+                message.channel.send("To add or remove a role, use !!role\n\nHere are the roles you can choose from:\n" +
+                "LFG (If you are interested in being pinged for people looking for game)\n" +
+                "NA (If you are in the NA timezone)\n" +
+                "EU (If you are in the EU timezone)\n" +
+                "SW (Stands for 'Stream Watcher,' for if you would like to watch peoples' streams!)")
+            }
+    } else if (command === 'role') {
+        if (args.length != 1){
+            message.channel.send("Please type the role you would like to add or remove!")
+            return;
+        } 
+            
+        var role = message.guild.roles.find(role => role.name === args[0].toUpperCase())
+        if (role != undefined) {
+            if (message.member.roles.find("name", role.name)) {
+                message.member.removeRole(role);
+                message.channel.send(`Successfully removed the role ${role.name}!`)
+            } else {
+                message.member.addRole(role);
+                message.channel.send(`Successfully added the role ${role.name}!`)
+            } 
+        } else if (args[0] != "SW" && "LFG" && "NA" && "EU") {
+            message.channel.send("I'm sorry! You cannot use that role!")
+        } else {
+            message.channel.send("That is not a role!")
+        }
+
     } else {
         message.channel.send("I do not recognize that command!");
     }

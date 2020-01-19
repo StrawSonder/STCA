@@ -186,7 +186,10 @@ client.on('message', message => {
         }
         //sets the specific rank
         var str = set(args[0], args[1], ranks[ind]);
-        if (typeof str === "string") return str;
+        if (typeof str === "string") {
+            message.channel.send(str);
+            return;
+        }
         ranks[ind] = str;
         var old = ranks[ind].role;
         ranks[ind] = setYear(ranks[ind]);

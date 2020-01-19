@@ -59,6 +59,21 @@ registration = (message, arr, add) => {
 }
 
 /**
+ * Deletes the message of the user (the bot commmand)
+ * Deletes last message of the bot (the bot response to the command)
+ * @param message the message to be deleted
+ */
+deleteMessages = (message) => {
+    message.channel.fetchMessages({ limit: 1 }).then(messages => {
+        let lastMessage = messages.first();
+        if (lastMessage.author.bot) {
+            lastMessage.delete(timeout);
+        }
+    }).catch(console.error);
+    message.delete(timeout);
+}
+
+/**
  * Run when bot sees a message
  * Mostly for commands
  */
@@ -141,13 +156,7 @@ client.on('message', message => {
         } else {
             message.channel.send(cannotUse);
         }
-        message.channel.fetchMessages({ limit: 1 }).then(messages => {
-            let lastMessage = messages.first();
-            if (lastMessage.author.bot) {
-                lastMessage.delete(timeout);
-            }
-        }).catch(console.error);
-        message.delete(timeout);
+        deleteMessages(message);
     } else if (command === 'checkout') {
         if (message.member.roles.find("name", "Teacher")) {
             message.channel.send("You have successfully checked out.")
@@ -158,13 +167,7 @@ client.on('message', message => {
         } else {
             message.channel.send(cannotUse);
         }
-        message.delete(timeout);
-        message.channel.fetchMessages({ limit: 1 }).then(messages => {
-            let lastMessage = messages.first();
-            if (lastMessage.author.bot) {
-                lastMessage.delete(timeout);
-            }
-        }).catch(console.error);
+        deleteMessages(message);
     /**
      * Updates one rank at a time for students that have already registered
      */

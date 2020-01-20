@@ -2,6 +2,8 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const {token, prefix} = require('./config.json')
+//timeout for checkin/checkout
+const timeout = 3000;
 //Adding Rank class and methods
 var Rank = require('./Rank.js');
 //Array for saving ranks

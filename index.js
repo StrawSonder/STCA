@@ -195,8 +195,8 @@ client.on('message', message => {
         ranks[ind] = setYear(ranks[ind]);
         var add = "";
         //checks if user should have changed a class
-        if (old !== ranks[ind].role) {
-            add = "\nYou are now a " + ranks[ind].role.name + "! Congratulations!";
+        if (old != ranks[ind].role) {
+            add = "\nYou are now a " + ranks[ind].role.name + "!";
             registration(message, roles, ranks[ind].role);
         }
         message.channel.send(greeting + "Your " + args[0].toUpperCase() + " rank is now " + args[1].toUpperCase() + "." + add);

@@ -79,7 +79,7 @@ deleteMessages = (message) => {
  * Run when bot sees a message
  * Mostly for commands
  */
-=======
+
 client.on('guildMemberAdd', member => {
     member.guild.channels.get('667773048732254244').send(`Welcome to the STCA, <@` + member.id + `>! If you are a student, head over to #registration !`); 
 });

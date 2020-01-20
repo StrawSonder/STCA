@@ -204,6 +204,7 @@ client.on('message', message => {
     } else if (command === 'help') {
         console.log(args[0])
         let helpargs = args[0]
+<<<<<<< Updated upstream
             if (args[0] == undefined) {
                 message.channel.send('If you are a student and would like to register, use !!register\n If you would like to add a role, use !!role\n If you do not know how to use these commands, use !!help (command)')
             } else if (args[0] == "register") {
@@ -220,6 +221,20 @@ client.on('message', message => {
             } else {
                 message.channel.send("I cannot help with that, I'm sorry!")
             }
+=======
+        if (args[0] == undefined) {
+            message.channel.send('If you are a student and would like to register, use !!register\n If you would like to add a role, use !!role\n If you do not know how to use these commands, use !!help (command)')
+        } else if (args[0] == "register") {
+            message.channel.send("To register as a student, use !!register [TC] [SZ] [RM] [CB]\n"
+            + "ex. !!register C+ B- A S+7")
+        } else if (args[0] == "role") {
+            message.channel.send("To add or remove a role, use !!role\n\nHere are the roles you can choose from:\n" +
+            "LFG (If you are interested in being pinged for people looking for game)\n" +
+            "NA (If you are in the NA timezone)\n" +
+            "EU (If you are in the EU timezone)\n" +
+            "SW (Stands for 'Stream Watcher,' for if you would like to watch peoples' streams!)")
+        }
+>>>>>>> Stashed changes
     } else if (command === 'role') {
         if (args.length != 1){
             message.channel.send("Please type the role you would like to add or remove!")

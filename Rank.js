@@ -85,10 +85,10 @@ set = (mode, rankName, rank) => {
     rankName = rankName.toUpperCase();
     var str = checkRank(rankName);
     if (typeof str === "string") return str;
-    if (mode === "TC") rank.TC = rank; 
-    else if (mode === "SZ") rank.SZ = rank;
-    else if (mode === "RM") rank.RM = rank;
-    else if (mode === "CB") rank.CB = rank;
+    if (mode === "TC") rank.TC = rankName; 
+    else if (mode === "SZ") rank.SZ = rankName;
+    else if (mode === "RM") rank.RM = rankName;
+    else if (mode === "CB") rank.CB = rankName;
     else return "Invalid mode.";
     rank = setTotal(rank);
     return rank;

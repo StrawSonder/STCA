@@ -79,6 +79,15 @@ deleteMessages = (message) => {
  * Run when bot sees a message
  * Mostly for commands
  */
+=======
+client.on('guildMemberAdd', member => {
+    member.guild.channels.get('667773048732254244').send(`Welcome to the STCA, <@` + member.id + `>! If you are a student, head over to #registration !`); 
+});
+
+client.on('guildMemberRemove', member => {
+    member.guild.channels.get('667773048732254244').send(`${member.user.tag} just left the server!`); 
+});
+
 client.on('message', message => {
     if (!message.content.startsWith(prefix) || message.author.bot) return;
     const cannotUse = "I'm sorry, you cannot use that command.";
@@ -158,6 +167,13 @@ client.on('message', message => {
             message.channel.send(cannotUse);
         }
         deleteMessages(message);
+        message.channel.fetchMessages({ limit: 1 }).then(messages => {
+            let lastMessage = messages.first();
+            if (lastMessage.author.bot) {
+                lastMessage.delete(timeout);
+            }
+        }).catch(console.error);
+        message.delete(timeout);
     } else if (command === 'checkout') {
         if (message.member.roles.find("name", "Teacher")) {
             message.channel.send("You have successfully checked out.")
@@ -203,6 +219,17 @@ client.on('message', message => {
         message.channel.send(greeting + "Your " + args[0].toUpperCase() + " rank is now " + args[1].toUpperCase() + "." + add);
     } else if (command === 'help') {
         console.log(args[0])
+        message.delete(timeout);
+        message.channel.fetchMessages({ limit: 1 }).then(messages => {
+            let lastMessage = messages.first();
+            if (lastMessage.author.bot) {
+                lastMessage.delete(timeout);
+            }
+        }).catch(console.error);
+    /**
+     * Updates one rank at a time for students that have already registered
+     */
+    } else if (command === 'help') {
         let helpargs = args[0]
             if (args[0] == undefined) {
                 message.channel.send('If you are a student and would like to register, use !!register\n If you would like to add a role, use !!role\n If you do not know how to use these commands, use !!help (command)')

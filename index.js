@@ -87,7 +87,6 @@ client.on('message', message => {
     const greeting = "Hello! I am the STCA\'s receptionist.\n";
     const args = message.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
-    const timeout = 3000;
     var freshman = message.guild.roles.find(role => role.name === "Freshman");
     var sophomore = message.guild.roles.find(role => role.name === "Sophomore");
     var junior = message.guild.roles.find(role => role.name === "Junior");

@@ -185,7 +185,7 @@ client.on('message', message => {
             return;
         }
         //sets the specific rank
-        var str = set(args[0], args[1], ranks[ind]);
+        var str = set(args[0].toUpperCase(), args[1].toUpperCase(), ranks[ind]);
         if (typeof str === "string") {
             message.channel.send(str);
             return;
@@ -197,9 +197,9 @@ client.on('message', message => {
         //checks if user should have changed a class
         if (old !== ranks[ind].role) {
             add = "\nYou are now a " + ranks[ind].role.name + "! Congratulations!";
-            registration(message, roles, rank.role);
+            registration(message, roles, ranks[ind].role);
         }
-        message.channel.send(greeting + "Your " + args[0] + " rank is now " + args[1] + "." + add);
+        message.channel.send(greeting + "Your " + args[0].toUpperCase() + " rank is now " + args[1].toUpperCase() + "." + add);
     } else if (command === 'help') {
         let helpargs = args[0]
             if (args[0] == undefined) {

@@ -202,6 +202,7 @@ client.on('message', message => {
         }
         message.channel.send(greeting + "Your " + args[0].toUpperCase() + " rank is now " + args[1].toUpperCase() + "." + add);
     } else if (command === 'help') {
+        console.log(args[0])
         let helpargs = args[0]
             if (args[0] == undefined) {
                 message.channel.send('If you are a student and would like to register, use !!register\n If you would like to add a role, use !!role\n If you do not know how to use these commands, use !!help (command)')
@@ -214,6 +215,10 @@ client.on('message', message => {
                 "NA (If you are in the NA timezone)\n" +
                 "EU (If you are in the EU timezone)\n" +
                 "SW (Stands for 'Stream Watcher,' for if you would like to watch peoples' streams!)")
+            } else if (args[0] == '<@!368889460378697730>' || args[0] == '<@368889460378697730>') {
+                message.channel.send("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA IM COMING TO HELP YOU HANG ON unless im sleeping or in school or streaming or busy in other way but otherwise AAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+            } else {
+                message.channel.send("I cannot help with that, I'm sorry!")
             }
     } else if (command === 'role') {
         if (args.length != 1){

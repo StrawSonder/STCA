@@ -132,19 +132,16 @@ client.on('message', message => {
         if (args.length == 5) arr = args.slice(1);
         for (var i = 0; i < 4; i++) arr[i] = arr[i].toUpperCase();
         //rank variable contains info about the ranks and the user that the ranks are associated with
-        var rank = new Rank(arr[0], arr[1], arr[2], arr[3], message);
-        var ind = ranks.findIndex(rank => rank.message.member.id == message.member.id);
-        //in general, errors are indicated by the method returning a string associated with that error
-        //instead of the object or primitive it was supposed to return
-        if (typeof rank === "string") {
-            message.channel.send(rank)
+        //if error is returned, return the error message and stop execution
+        try {
+            var rank = new Rank(arr[0], arr[1], arr[2], arr[3], message);
+        } catch (err) {
+            message.channel.send(err);
             return;
         }
+        var ind = ranks.findIndex(ele => ele.message.member.id == message.member.id);
         //if valid rank and not reregistration, add it to the array
-        if (ind == -1) {
-            ranks.push(rank);
-        }
-
+        if (ind == -1) ranks.push(rank);
         else {
         ranks[ind] = rank;
         registration(message, roles, rank.role);
@@ -198,12 +195,12 @@ client.on('message', message => {
             return;
         }
         //sets the specific rank
-        var str = set(args[0].toUpperCase(), args[1].toUpperCase(), ranks[ind]);
-        if (typeof str === "string") {
+        try {
+            ranks[ind] = set(args[0].toUpperCase(), args[1].toUpperCase(), ranks[ind]);
+        } catch (err) {
             message.channel.send(str);
             return;
         }
-        ranks[ind] = str;
         var old = ranks[ind].role;
         ranks[ind] = setYear(ranks[ind]);
         var add = "";
@@ -214,30 +211,27 @@ client.on('message', message => {
         }
         message.channel.send(greeting + "Your " + args[0].toUpperCase() + " rank is now " + args[1].toUpperCase() + "." + add);
     } else if (command === 'help') {
-        console.log(args[0])
-        let helpargs = args[0]
-            if (args[0] == undefined) {
-                message.channel.send('If you are a student and would like to register, use !!register\n If you would like to add a role, use !!role\n If you do not know how to use these commands, use !!help (command)')
-            } else if (args[0].toLowerCase() == "register") {
-                message.channel.send("To register as a student, use !!register [TC] [SZ] [RM] [CB]\n"
-                + "ex. !!register C+ B- A S+7")
-            } else if (args[0].toLowerCase() == "role") {
-                message.channel.send("To add or remove a role, use !!role\n\nHere are the roles you can choose from:\n" +
-                "LFG (If you are interested in being pinged for people looking for game)\n" +
-                "NA (If you are in the NA timezone)\n" +
-                "EU (If you are in the EU timezone)\n" +
-                "SW (Stands for 'Stream Watcher,' for if you would like to watch peoples' streams!)")
-            } else if (args[0].toLowerCase() == '<@!368889460378697730>' || args[0].toUpperCase() == '<@368889460378697730>') {
-                message.channel.send("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA IM COMING TO HELP YOU HANG ON unless im sleeping or in school or streaming or busy in other way but otherwise AAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-            } else {
-                message.channel.send("I cannot help with that, I'm sorry!")
-            }
+        let helpargs = args[0];
+        if (args[0] == undefined) {
+            message.channel.send('If you are a student and would like to register, use !!register\n If you would like to add a role, use !!role\n If you do not know how to use these commands, use !!help (command)')
+        } else if (args[0].toLowerCase() == "register") {
+            message.channel.send("To register as a student, use !!register [TC] [SZ] [RM] [CB]\n"
+            + "ex. !!register C+ B- A S+7")
+        } else if (args[0].toLowerCase() == "role") {
+            message.channel.send("To add or remove a role, use !!role\n\nHere are the roles you can choose from:\n" +
+            "LFG (If you are interested in being pinged for people looking for game)\n" +
+            "NA (If you are in the NA timezone)\n" +
+            "EU (If you are in the EU timezone)\n" +
+            "SW (Stands for 'Stream Watcher,' for if you would like to watch peoples' streams!)")
+        } else if (args[0].toLowerCase() == '<@!368889460378697730>' || args[0].toUpperCase() == '<@368889460378697730>') {
+            message.channel.send("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA IM COMING TO HELP YOU HANG ON"
+                + "unless im sleeping or in school or streaming or busy in other way but otherwise AAAAAAAAAAAAAAAAAAAAAAAAAAAAtusbx jt evncp");
+        } else message.channel.send("I cannot help with that, I'm sorry!");
     } else if (command === 'role') {
         if (args.length != 1){
             message.channel.send("Please type the role you would like to add or remove!")
             return;
         } 
-            
         var role = message.guild.roles.find(role => role.name === args[0].toUpperCase())
         if (role != undefined) {
             if (message.member.roles.find("name", role.name)) {
@@ -247,15 +241,9 @@ client.on('message', message => {
                 message.member.addRole(role);
                 message.channel.send(`Successfully added the role ${role.name}!`)
             } 
-        } else if (args[0] != "SW" && "LFG" && "NA" && "EU") {
-            message.channel.send("I'm sorry! You cannot use that role!")
-        } else {
-            message.channel.send("That is not a role!")
-        }
-
-    } else {
-        message.channel.send("I do not recognize that command!");
-    }
-})
+        } else if (args[0] != "SW" && "LFG" && "NA" && "EU") message.channel.send("I'm sorry! You cannot use that role!");
+        else message.channel.send("That is not a role!");
+    } else message.channel.send("I do not recognize that command!");
+});
 
 client.login(token);

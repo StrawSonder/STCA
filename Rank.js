@@ -3,23 +3,20 @@
 /**
  * Calculates the total associated with those ranks
  * @param rank the rank associated with the mode
+ * @throws error containing message for invalid rank
  * @return str if there is an error, the associated total if no error
  */
 calcTotal = (TC, SZ, RM, CB) => {
     var arr = [TC, SZ, RM, CB];
     var total = 0;
-    var str;
-    for (var i = 0; i < 4; i++) {
-        str = checkRank(arr[i]);
-        if (typeof str === "string") return str;
-        else total += str;
-    }
+    for (var i = 0; i < 4; i++) total += checkRank(arr[i]);
     return total;
 }
 
 /**
  * Checks if the rank is valid
  * @param rank the rank to be checked
+ * @throws error containing message for invalid rank
  * @return str if there is an error, the associated total if no error
  */
 checkRank = (rank) => {
@@ -51,8 +48,8 @@ checkRank = (rank) => {
 
     else if (rank === "X") total += 8;
     
-    else if (rank === "S+") return "Please add a number after S+.";
-    else return "Those are not correct rankings! Correct usage is:\n!!register [TC] [SZ] [RM] [CB]\nex. !!register C B A S";
+    else if (rank === "S+") throw "Please add a number after S+.";
+    else throw "Those are not correct rankings! Correct usage is:\n!!register [TC] [SZ] [RM] [CB]\nex. !!register C B A S";
     return total;
 }
 
@@ -82,13 +79,12 @@ getYear = (total, message) => {
 set = (mode, rankName, rank) => {
     mode = mode.toUpperCase();
     rankName = rankName.toUpperCase();
-    var str = checkRank(rankName);
-    if (typeof str === "string") return str;
+    checkRank(rankName);
     if (mode === "TC") rank.TC = rankName; 
     else if (mode === "SZ") rank.SZ = rankName;
     else if (mode === "RM") rank.RM = rankName;
     else if (mode === "CB") rank.CB = rankName;
-    else return "Invalid mode.";
+    else throw "Invalid mode.";
     rank = setTotal(rank);
     return rank;
 }
@@ -98,9 +94,7 @@ set = (mode, rankName, rank) => {
  * @return total if no error, str if error
  */
 setTotal = (rank) => {
-    var str = calcTotal(rank.TC, rank.SZ, rank.RM, rank.CB);
-    if (typeof str === "string") return str;
-    rank.total = str;
+    rank.total = calcTotal(rank.TC, rank.SZ, rank.RM, rank.CB);
     return rank;
 }
 
@@ -123,12 +117,11 @@ class Rank {
      * @param {rainmaker} RM 
      * @param {clam blitz} CB 
      * @param {message sent by the user} message 
+     * @throws error containing message for invalid input
      * @return str if there is an error, will have the associated error message
      */
     constructor(TC, SZ, RM, CB, message) {
-        var str = calcTotal(TC, SZ, RM, CB);
-        if (typeof str === 'string') return str;
-        else this.total = str;
+        this.total = calcTotal(TC, SZ, RM, CB);
         this.role = getYear(this.total, message);
         this.TC = TC;
         this.SZ = SZ;

@@ -3,7 +3,7 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 const {token, prefix} = require('./config.json')
 //timeout for checkin/checkout
-const timeout = 3000;
+const timeout = 10000;
 //Adding Rank class and methods
 var Rank = require('./Rank.js');
 //Array for saving ranks
@@ -95,6 +95,7 @@ client.on('message', message => {
     var roles = [freshman, sophomore, junior, senior, visitor];
     var teacher = message.guild.roles.find(role => role.name === "Teacher");
     var offline = message.guild.roles.find(role => role.name === "Offline Teacher");
+    var student = message.guild.roles.find(role => role.name === "Student")
 
     /**
      * Registration command
@@ -104,6 +105,10 @@ client.on('message', message => {
     if (command === 'register') {
         var arr, member, name, possessive;
         //only admins have the power to add roles to others
+        if (message.member.roles.find("name", "Teacher") || message.member.roles.find("name","Offline Teacher")) {
+            message.channel.send("You're a teacher, not a student! You don't need to register!");
+            return;
+        } 
         if (args.length == 5 && message.member.hasPermission("ADMINISTRATOR")) {
             arr = args.slice(1);
             member = message.mentions.members.first();
@@ -132,17 +137,24 @@ client.on('message', message => {
         //in general, errors are indicated by the method returning a string associated with that error
         //instead of the object or primitive it was supposed to return
         if (typeof rank === "string") {
-            message.channel.send(rank);
+            message.channel.send(rank)
             return;
         }
         //if valid rank and not reregistration, add it to the array
-        if (ind == -1) ranks.push(rank);
-        else ranks[ind] = rank;
+        if (ind == -1) {
+            ranks.push(rank);
+        }
+
+        else {
+        ranks[ind] = rank;
         registration(message, roles, rank.role);
         message.channel.send(greeting + possessive + " ranks are "
             + arr[0] + " for tower control, " + arr[1] + " for splat zones, "
             + arr[2] + " for rainmaker, and " + arr[3] + " for clam blitz.\n"
-            + name + " now a " + rank.role.name + " of the academy!");
+            + name + ` now a ${rank.role.name} of the academy!`);
+            message.member.addRole(student);
+        }
+        
     /**
      * checkin command allows offline teachers to check in
      * Offline Teacher is unpingable, while Teacher is pingable

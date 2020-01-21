@@ -52,8 +52,7 @@ checkRank = (rank) => {
     else if (rank === "X") total += 8;
     
     else if (rank === "S+") return "Please add a number after S+.";
-    else return "Those are not correct rankings! Correct usage is:\n!!register [TC] [SZ] [RM] [CB]\n"
-        + "ex. !!register C B A S";
+    else return "Those are not correct rankings! Correct usage is:\n!!register [TC] [SZ] [RM] [CB]\nex. !!register C B A S";
     return total;
 }
 
@@ -128,7 +127,7 @@ class Rank {
      */
     constructor(TC, SZ, RM, CB, message) {
         var str = calcTotal(TC, SZ, RM, CB);
-        if (typeof str === "string") return str;
+        if (typeof str === 'string') return str;
         else this.total = str;
         this.role = getYear(this.total, message);
         this.TC = TC;

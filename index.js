@@ -33,7 +33,11 @@ function shutdown() {
         process.exit(0);
     }
     var channel = guild.channels.find(channel => channel.name === "general");
-    channel.send(JSON.stringify(ranks));
+    var arr = [];
+    for (var i = 0; i < ranks.length; i++) {
+        arr.push({TC: ranks[i].TC, SZ: ranks[i].SZ, RM: ranks[i].RM, CB: ranks[i].CB, id: ranks[i].id});
+    }
+    channel.send(JSON.stringify(arr));
 }
 
 client.on('ready', () => {
@@ -245,7 +249,7 @@ client.on('message', message => {
                 + "unless im sleeping or in school or streaming or busy in other way but otherwise AAAAAAAAAAAAAAAAAAAAAAAAAAAAtusbx jt evncp");
         } else message.channel.send("I cannot help with that, I'm sorry!");
     } else if (command === 'role') {
-        if (args.length != 1){
+        if (args.length != 1) {
             message.channel.send("Please type the role you would like to add or remove!")
             return;
         } 

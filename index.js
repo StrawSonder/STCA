@@ -9,6 +9,8 @@ var Rank = require('./Rank.js');
 //Array for saving ranks
 var ranks = [];
 
+var guild, freshman, sophomore, junior, senior, visitor, teacher, offline, student;
+
 var express = require('express');
 var app = express();
 
@@ -22,8 +24,30 @@ app.get('/', function(request, response) {
     console.log('App is running, server is listening on port ', app.get('port'));
 });
 
+// process.on('SIGTERM', shutdown('SIGTERM')).on('SIGINT', shutdown('SIGINT')).on('uncaughtException', shutdown('uncaughtException'));
+process.on('SIGINT', shutdown)
+
+function shutdown() {
+    if (guild == undefined) {
+        console.log("BOT HAS FAILED");
+        process.exit(0);
+    }
+    var channel = guild.channels.find(channel => channel.name === "general");
+    channel.send(JSON.stringify(ranks));
+}
+
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
+    guild = client.guilds.get('667901183909953565');
+    freshman = guild.roles.find(role => role.name === "Freshman");
+    sophomore = guild.roles.find(role => role.name === "Sophomore");
+    junior = guild.roles.find(role => role.name === "Junior");
+    senior = guild.roles.find(role => role.name === "Senior");
+    visitor = guild.roles.find(role => role.name === "Visitor");
+    roles = [freshman, sophomore, junior, senior, visitor];
+    teacher = guild.roles.find(role => role.name === "Teacher");
+    offline = guild.roles.find(role => role.name === "Offline Teacher");
+    student = guild.roles.find(role => role.name === "Student")
 })
 
 /**
@@ -50,12 +74,12 @@ client.on('guildMemberRemove', member => {
  * @param arr the array of roles
  * @param add the role to be added
  */
-registration = (message, arr, add) => {
+registration = (member, arr, add) => {
     for (var i = 0; i < arr.length; i++) {
         if (arr[i] === add) {
-            message.member.addRole(arr[i]);
+            member.addRole(arr[i]);
         } else {
-            message.member.removeRole(arr[i]);
+            member.removeRole(arr[i]);
         }
     }
 }
@@ -80,6 +104,10 @@ deleteMessages = (message) => {
  * Mostly for commands
  */
 client.on('message', message => {
+    // if (guild == undefined) {
+    //     guild = message.guild;
+    //     channel = message.channel;
+    // }
     if (!message.content.startsWith(prefix) || message.author.bot) return;
     const cannotUse = "I'm sorry, you cannot use that command.";
     const rankings = "Those are not correct rankings! Correct usage is:\n!!register [TC] [SZ] [RM] [CB]\n"
@@ -87,15 +115,6 @@ client.on('message', message => {
     const greeting = "Hello! I am the STCA\'s receptionist.\n";
     const args = message.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
-    var freshman = message.guild.roles.find(role => role.name === "Freshman");
-    var sophomore = message.guild.roles.find(role => role.name === "Sophomore");
-    var junior = message.guild.roles.find(role => role.name === "Junior");
-    var senior = message.guild.roles.find(role => role.name === "Senior");
-    var visitor = message.guild.roles.find(role => role.name === "Visitor");
-    var roles = [freshman, sophomore, junior, senior, visitor];
-    var teacher = message.guild.roles.find(role => role.name === "Teacher");
-    var offline = message.guild.roles.find(role => role.name === "Offline Teacher");
-    var student = message.guild.roles.find(role => role.name === "Student")
 
     /**
      * Registration command
@@ -105,7 +124,7 @@ client.on('message', message => {
     if (command === 'register') {
         var arr, member, name, possessive;
         //only admins have the power to add roles to others
-        if (message.member.roles.find("name", "Teacher") || message.member.roles.find("name","Offline Teacher")) {
+        if (message.member.roles.find(role => role.name === "Teacher") || message.member.roles.find(role => role.name === "Offline Teacher")) {
             message.channel.send("You're a teacher, not a student! You don't need to register!");
             return;
         } 
@@ -139,40 +158,38 @@ client.on('message', message => {
             message.channel.send(err);
             return;
         }
-        var ind = ranks.findIndex(ele => ele.message.member.id == message.member.id);
+        var ind = ranks.findIndex(ele => ele.id == message.member.id);
         //if valid rank and not reregistration, add it to the array
         if (ind == -1) ranks.push(rank);
-        else {
-        ranks[ind] = rank;
-        registration(message, roles, rank.role);
+        else ranks[ind] = rank;
+        registration(message.member, roles, rank.role);
         message.channel.send(greeting + possessive + " ranks are "
             + arr[0] + " for tower control, " + arr[1] + " for splat zones, "
             + arr[2] + " for rainmaker, and " + arr[3] + " for clam blitz.\n"
             + name + ` now a ${rank.role.name} of the academy!`);
             message.member.addRole(student);
-        }
         
     /**
      * checkin command allows offline teachers to check in
      * Offline Teacher is unpingable, while Teacher is pingable
      */
     } else if (command === 'checkin') {
-        if (message.member.roles.find("name", "Offline Teacher")) {
+        if (message.member.roles.find(role => role.name === "Offline Teacher")) {
             message.channel.send("You have successfully checked in.")
             message.member.addRole(teacher);
             message.member.removeRole(offline);
-        } else if (message.member.roles.find("name", "Teacher")) {
+        } else if (message.member.roles.find(role => role.name === "Teacher")) {
             message.channel.send("You are already checked in!");
         } else {
             message.channel.send(cannotUse);
         }
         deleteMessages(message);
     } else if (command === 'checkout') {
-        if (message.member.roles.find("name", "Teacher")) {
+        if (message.member.roles.find(role => role.name === "Teacher")) {
             message.channel.send("You have successfully checked out.")
             message.member.addRole(offline);
             message.member.removeRole(teacher);
-        } else if (message.member.roles.find("name", "Offline Teacher")) {
+        } else if (message.member.roles.find(role => role.name === "Offline Teacher")) {
             message.channel.send("You are already checked out!");
         } else {
             message.channel.send(cannotUse);
@@ -188,7 +205,7 @@ client.on('message', message => {
             return;
         }
         //finds the rank object associated with the user
-        var ind = ranks.findIndex(rank => rank.message.member.id == message.member.id);
+        var ind = ranks.findIndex(rank => rank.id == message.member.id);
         if (ind == -1) {
             message.channel.send("You must register first!\n"
                 + "If you had previously registered and are getting this error, ping @Straw or @leonidasxlii.");
@@ -196,22 +213,22 @@ client.on('message', message => {
         }
         //sets the specific rank
         try {
-            ranks[ind] = set(args[0].toUpperCase(), args[1].toUpperCase(), ranks[ind]);
+            ranks[ind].set(args[0].toUpperCase(), args[1].toUpperCase());
         } catch (err) {
-            message.channel.send(str);
+            message.channel.send(err);
             return;
         }
         var old = ranks[ind].role;
-        ranks[ind] = setYear(ranks[ind]);
+        // ranks[ind] = setYear(ranks[ind]);
+        ranks[ind].setYear();
         var add = "";
         //checks if user should have changed a class
         if (old != ranks[ind].role) {
             add = "\nYou are now a " + ranks[ind].role.name + "!";
-            registration(message, roles, ranks[ind].role);
+            registration(message.member, roles, ranks[ind].role);
         }
         message.channel.send(greeting + "Your " + args[0].toUpperCase() + " rank is now " + args[1].toUpperCase() + "." + add);
     } else if (command === 'help') {
-        let helpargs = args[0];
         if (args[0] == undefined) {
             message.channel.send('If you are a student and would like to register, use !!register\n If you would like to add a role, use !!role\n If you do not know how to use these commands, use !!help (command)')
         } else if (args[0].toLowerCase() == "register") {
@@ -232,9 +249,9 @@ client.on('message', message => {
             message.channel.send("Please type the role you would like to add or remove!")
             return;
         } 
-        var role = message.guild.roles.find(role => role.name === args[0].toUpperCase())
+        var role = guild.roles.find(role => role.name === args[0].toUpperCase())
         if (role != undefined) {
-            if (message.member.roles.find("name", role.name)) {
+            if (message.member.roles.find(ele => ele.name === role.name)) {
                 message.member.removeRole(role);
                 message.channel.send(`Successfully removed the role ${role.name}!`)
             } else {
@@ -243,6 +260,19 @@ client.on('message', message => {
             } 
         } else if (args[0] != "SW" && "LFG" && "NA" && "EU") message.channel.send("I'm sorry! You cannot use that role!");
         else message.channel.send("That is not a role!");
+    } else if (command === 'start') {
+        // if (!message.member.hasPermission("ADMINISTRATOR")) {
+        //     message.channel.send(cannotUse);
+        //     return;
+        // }
+        ranks = JSON.parse(message.content.substring(8)); //doesn't parse in the command
+        new Rank("C", "C", "C", "C", message); //initializes roles variable in Rank.js
+        for (var i = 0; i < ranks.length; i++) {
+            ranks[i] = new Rank(ranks[i].TC, ranks[i].SZ, ranks[i].RM, ranks[i].CB, ranks[i].id);
+            var member = guild.members.find(member => member.id == ranks[i].id);
+            registration(member, roles, ranks[i].role);
+        }
+        message.channel.send("Successfully re-registered using past data!");
     } else message.channel.send("I do not recognize that command!");
 });
 

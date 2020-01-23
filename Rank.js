@@ -1,16 +1,9 @@
 //https://regex101.com/r/OrmORY/1
 
-/**
- * Calculates the total associated with those ranks
- * @param rank the rank associated with the mode
- * @throws error containing message for invalid rank
- * @return str if there is an error, the associated total if no error
- */
-calcTotal = (TC, SZ, RM, CB) => {
-    var arr = [TC, SZ, RM, CB];
-    var total = 0;
-    for (var i = 0; i < 4; i++) total += checkRank(arr[i]);
-    return total;
+var roles;
+
+initial = (message) => {
+    roles = message.guild.roles;
 }
 
 /**
@@ -54,57 +47,37 @@ checkRank = (rank) => {
 }
 
 /**
+ * Calculates the total associated with those ranks
+ * @param rank the rank associated with the mode
+ * @throws error containing message for invalid rank
+ * @return str if there is an error, the associated total if no error
+ */
+calcTotal = (TC, SZ, RM, CB) => {
+    var arr = [TC, SZ, RM, CB];
+    var total = 0;
+    for (var i = 0; i < 4; i++) total += checkRank(arr[i]);
+    return total;
+}
+
+
+/**
  * Gets the role associated with the total
  * @param total the total to be used for calculation
- * @return role the role that should be given to the user that has that total
+ * @return rolename of the role that should be given to the user that has that total
  */
-getYear = (total, message) => {
-    var freshman = message.guild.roles.find(role => role.name === "Freshman");
-    var sophomore = message.guild.roles.find(role => role.name === "Sophomore");
-    var junior = message.guild.roles.find(role => role.name === "Junior");
-    var senior = message.guild.roles.find(role => role.name === "Senior");
-    var role;
-    if (total < 10 ) role = freshman;
-    else if (total < 20) role = sophomore;
-    else if (total < 30) role = junior;
-    else role = senior;
-    return role;
+getYear = (total) => {
+    var name;
+    if (total < 10 ) name = "Freshman";
+    else if (total < 20) name = "Sophomore";
+    else if (total < 30) name = "Junior";
+    else name = "Senior";
+    return name;
 }
 
-/**
- * Sets a specific mode's rank using user's data from ranks array
- * @param {Mode that user is setting} mode 
- * @param {Rank to be setting the mode's rank to} rank 
- */
-set = (mode, rankName, rank) => {
-    mode = mode.toUpperCase();
-    rankName = rankName.toUpperCase();
-    checkRank(rankName);
-    if (mode === "TC") rank.TC = rankName; 
-    else if (mode === "SZ") rank.SZ = rankName;
-    else if (mode === "RM") rank.RM = rankName;
-    else if (mode === "CB") rank.CB = rankName;
-    else throw "Invalid mode.";
-    rank = setTotal(rank);
-    return rank;
-}
-
-/**
- * Sets the total if there is no error
- * @return total if no error, str if error
- */
-setTotal = (rank) => {
-    rank.total = calcTotal(rank.TC, rank.SZ, rank.RM, rank.CB);
-    return rank;
-}
-
-/**
- * Sets the class of the student (freshman, sophomore, etc.)
- */
-setYear = (rank) => {
-    rank.role = getYear(rank.total, rank.message);
-    return rank;
-}
+// setYear = (rank) => {
+//     rank.role = getYear(rank.total, rank.message);
+//     return rank;
+// }
 
 /**
  * Rank object contains information about the ranks for the modes of the user as well as the user id
@@ -121,13 +94,39 @@ class Rank {
      * @return str if there is an error, will have the associated error message
      */
     constructor(TC, SZ, RM, CB, message) {
+        if (typeof message != "string") {
+            if (roles == undefined) initial(message);
+            this.id = message.member.id;
+        } else this.id = message;
         this.total = calcTotal(TC, SZ, RM, CB);
-        this.role = getYear(this.total, message);
+        this.role = roles.find(role => role.name === getYear(this.total));
         this.TC = TC;
         this.SZ = SZ;
         this.RM = RM;
         this.CB = CB;
-        this.message = message;
+
+    }
+
+    /**
+     * Sets a specific mode's rank using user's data from ranks array
+     * @param {Mode that user is setting} mode 
+     * @param {Rank to be setting the mode's rank to} rank 
+     */
+    set(mode, rankName) {
+        mode = mode.toUpperCase();
+        rankName = rankName.toUpperCase();
+        checkRank(rankName);
+        if (this[mode] == undefined) throw "Invalid mode.";
+        else if (mode === "message") throw "Stop trying to break the bot, hacker!!";
+        this[mode] = rankName;
+        this.total = calcTotal(this.TC, this.SZ, this.RM, this.CB);
+    }
+
+    /**
+     * Sets the class of the student (freshman, sophomore, etc.)
+     */
+    setYear() {
+        this.role = roles.find(role => role.name === getYear(this.total));
     }
 }
 

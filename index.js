@@ -104,10 +104,6 @@ deleteMessages = (message) => {
  * Mostly for commands
  */
 client.on('message', message => {
-    // if (guild == undefined) {
-    //     guild = message.guild;
-    //     channel = message.channel;
-    // }
     if (!message.content.startsWith(prefix) || message.author.bot) return;
     const cannotUse = "I'm sorry, you cannot use that command.";
     const rankings = "Those are not correct rankings! Correct usage is:\n!!register [TC] [SZ] [RM] [CB]\n"
@@ -168,7 +164,7 @@ client.on('message', message => {
             + arr[2] + " for rainmaker, and " + arr[3] + " for clam blitz.\n"
             + name + ` now a ${rank.role.name} of the academy!`);
             message.member.addRole(student);
-        
+      
     /**
      * checkin command allows offline teachers to check in
      * Offline Teacher is unpingable, while Teacher is pingable
@@ -257,7 +253,7 @@ client.on('message', message => {
             } else {
                 message.member.addRole(role);
                 message.channel.send(`Successfully added the role ${role.name}!`)
-            } 
+            }
         } else if (args[0] != "SW" && "LFG" && "NA" && "EU") message.channel.send("I'm sorry! You cannot use that role!");
         else message.channel.send("That is not a role!");
     } else if (command === 'start') {

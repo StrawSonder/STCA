@@ -42,7 +42,7 @@ function shutdown() {
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    guild = client.guilds.get('667773048732254244');
+    guild = client.guilds.get('665396787963625491');
     freshman = guild.roles.find(role => role.name === "Freshman");
     sophomore = guild.roles.find(role => role.name === "Sophomore");
     junior = guild.roles.find(role => role.name === "Junior");

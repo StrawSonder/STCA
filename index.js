@@ -32,7 +32,7 @@ function shutdown() {
         console.log("BOT HAS FAILED");
         process.exit(0);
     }
-    var channel = guild.channels.find(channel => channel.name === "general");
+    var channel = guild.channels.get('670054185764519952');
     var arr = [];
     for (var i = 0; i < ranks.length; i++) {
         arr.push({TC: ranks[i].TC, SZ: ranks[i].SZ, RM: ranks[i].RM, CB: ranks[i].CB, id: ranks[i].id});
@@ -42,7 +42,7 @@ function shutdown() {
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    guild = client.guilds.get('667901183909953565');
+    guild = client.guilds.get('667773048732254244');
     freshman = guild.roles.find(role => role.name === "Freshman");
     sophomore = guild.roles.find(role => role.name === "Sophomore");
     junior = guild.roles.find(role => role.name === "Junior");
@@ -265,10 +265,10 @@ client.on('message', message => {
         } else if (args[0] != "SW" && "LFG" && "NA" && "EU") message.channel.send("I'm sorry! You cannot use that role!");
         else message.channel.send("That is not a role!");
     } else if (command === 'start') {
-        // if (!message.member.hasPermission("ADMINISTRATOR")) {
-        //     message.channel.send(cannotUse);
-        //     return;
-        // }
+        if (!message.member.hasPermission("ADMINISTRATOR")) {
+            message.channel.send(cannotUse);
+            return;
+        }
         ranks = JSON.parse(message.content.substring(8)); //doesn't parse in the command
         new Rank("C", "C", "C", "C", message); //initializes roles variable in Rank.js
         for (var i = 0; i < ranks.length; i++) {

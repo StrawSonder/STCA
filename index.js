@@ -247,6 +247,10 @@ client.on('message', message => {
         } 
         var role = guild.roles.find(role => role.name === args[0].toUpperCase())
         if (role != undefined) {
+            if (args[0] != "SW" && "LFG" && "NA" && "EU") {
+                message.channel.send("I'm sorry! You cannot use that role!");
+                return;
+            }
             if (message.member.roles.find(ele => ele.name === role.name)) {
                 message.member.removeRole(role);
                 message.channel.send(`Successfully removed the role ${role.name}!`)
@@ -254,7 +258,8 @@ client.on('message', message => {
                 message.member.addRole(role);
                 message.channel.send(`Successfully added the role ${role.name}!`)
             }
-        } else if (args[0] != "SW" && "LFG" && "NA" && "EU") message.channel.send("I'm sorry! You cannot use that role!");
+            deleteMessages(message);
+        }
         else message.channel.send("That is not a role!");
     } else if (command === 'start') {
         // if (!message.member.hasPermission("ADMINISTRATOR")) {

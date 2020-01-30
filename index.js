@@ -38,7 +38,7 @@ function shutdown() {
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    guild = client.guilds.get('667901183909953565');
+    guild = client.guilds.get('665396787963625491');
     freshman = guild.roles.find(role => role.name === "Freshman");
     sophomore = guild.roles.find(role => role.name === "Sophomore");
     junior = guild.roles.find(role => role.name === "Junior");
@@ -57,7 +57,7 @@ client.on('ready', () => {
 client.on('guildMemberAdd', (guildMember) => {
     guildMember.addRole(guildMember.guild.roles.find(role => role.name === "Visitor"));
     console.log(`${guildMember.user.tag} has gotten the visitor role.`);
-    member.guild.channels.get('667773048732254244').send(`Welcome to the STCA, <@` + member.id + `>! If you are a student, head over to #registration !`); 
+    guildMember.guild.channels.get('667773048732254244').send(`Welcome to the STCA, <@` + guildMember.id + `>! If you are a student, head over to #registration !`); 
 })
 
 /**
@@ -247,7 +247,7 @@ client.on('message', message => {
         } 
         var role = guild.roles.find(role => role.name === args[0].toUpperCase())
         if (role != undefined) {
-            if (args[0] != "SW" && "LFG" && "NA" && "EU") {
+            if (role != "SW" && "LFG" && "NA" && "EU") {
                 message.channel.send("I'm sorry! You cannot use that role!");
                 return;
             }

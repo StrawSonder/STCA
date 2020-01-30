@@ -93,7 +93,7 @@ class Rank {
      * @throws error containing message for invalid input
      * @return str if there is an error, will have the associated error message
      */
-    constructor(TC, SZ, RM, CB, message) {
+    constructor(TC, SZ, RM, CB, message, fc) {
         if (typeof message != "string") {
             if (roles == undefined) initial(message);
             this.id = message.member.id;
@@ -104,7 +104,8 @@ class Rank {
         this.SZ = SZ;
         this.RM = RM;
         this.CB = CB;
-
+        this.fc = fc;
+        this.ask = false;
     }
 
     /**

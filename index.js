@@ -32,8 +32,12 @@ function shutdown() {
         console.log("BOT HAS FAILED");
         process.exit(0);
     }
-    var channel = guild.channels.find(channel => channel.name === "general");
-    channel.send(JSON.stringify(ranks));
+    var channel = guild.channels.get('670054185764519952');
+    var arr = [];
+    for (var i = 0; i < ranks.length; i++) {
+        arr.push({TC: ranks[i].TC, SZ: ranks[i].SZ, RM: ranks[i].RM, CB: ranks[i].CB, id: ranks[i].id, fc: ranks[i].fc});
+    }
+    channel.send(JSON.stringify(arr));
 }
 
 client.on('ready', () => {
@@ -100,6 +104,19 @@ deleteMessages = (message) => {
 }
 
 /**
+ * Checks the fc to see if it is valid (in the right format)
+ * @param fc the friend code to be checked
+ * @return the message that should be sent, depending on if the fc is valid or not
+ */
+checkFC = (fc) => {
+    if (true) {
+        return fc;
+    } else {
+        return "Your FC is not valid! It should be in the format ####-####-####, or similar";
+    }
+}
+
+/**
  * Run when bot sees a message
  * Mostly for commands
  */
@@ -111,6 +128,7 @@ client.on('message', message => {
     const greeting = "Hello! I am the STCA\'s receptionist.\n";
     const args = message.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
+    const roleArr = ["NA", "EU", "JP", "SW", "LFG"];
 
     /**
      * Registration command
@@ -120,10 +138,6 @@ client.on('message', message => {
     if (command === 'register') {
         var arr, member, name, possessive;
         //only admins have the power to add roles to others
-        if (message.member.roles.find(role => role.name === "Teacher") || message.member.roles.find(role => role.name === "Offline Teacher")) {
-            message.channel.send("You're a teacher, not a student! You don't need to register!");
-            return;
-        } 
         if (args.length == 5 && message.member.hasPermission("ADMINISTRATOR")) {
             arr = args.slice(1);
             member = message.mentions.members.first();
@@ -135,6 +149,10 @@ client.on('message', message => {
             possessive = member.user.username + "'s";
         //anyone can register themselves
         } else if (args.length == 4) {
+            if (message.member.roles.find(role => role.name === "Teacher") || message.member.roles.find(role => role.name === "Offline Teacher")) {
+                message.channel.send("You're a teacher, not a student! You don't need to register!");
+                return;
+            } 
             arr = args;
             name = "You are";
             possessive = "Your";
@@ -235,19 +253,23 @@ client.on('message', message => {
             "LFG (If you are interested in being pinged for people looking for game)\n" +
             "NA (If you are in the NA timezone)\n" +
             "EU (If you are in the EU timezone)\n" +
+            "JP (If you are in the JP timezone)\n" +
             "SW (Stands for 'Stream Watcher,' for if you would like to watch peoples' streams!)")
+        } else if (args[0].toLowerCase() == "fc") {
+            message.channel.send("To add your own fc, use !!fc [your fc]\nTo get your fc, use !!fc\nTo get someone else's fc, use !!fc @[member]\n"
+                + "If you need to change your fc, use !!fc @[yourself] [updated fc]");
         } else if (args[0].toLowerCase() == '<@!368889460378697730>' || args[0].toUpperCase() == '<@368889460378697730>') {
             message.channel.send("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA IM COMING TO HELP YOU HANG ON"
                 + "unless im sleeping or in school or streaming or busy in other way but otherwise AAAAAAAAAAAAAAAAAAAAAAAAAAAAtusbx jt evncp");
         } else message.channel.send("I cannot help with that, I'm sorry!");
     } else if (command === 'role') {
-        if (args.length != 1){
+        if (args.length != 1) {
             message.channel.send("Please type the role you would like to add or remove!")
             return;
         } 
-        var role = guild.roles.find(role => role.name === args[0].toUpperCase())
+        var role = guild.roles.find(ele => ele.name === args[0].toUpperCase())
         if (role != undefined) {
-            if (args[0] != "SW" && "LFG" && "NA" && "EU") {
+            if (roleArr.findIndex(ele => ele === args[0].toUpperCase()) == -1) {
                 message.channel.send("I'm sorry! You cannot use that role!");
                 return;
             }
@@ -262,18 +284,103 @@ client.on('message', message => {
         }
         else message.channel.send("That is not a role!");
     } else if (command === 'start') {
-        // if (!message.member.hasPermission("ADMINISTRATOR")) {
-        //     message.channel.send(cannotUse);
-        //     return;
-        // }
+        if (!message.member.hasPermission("ADMINISTRATOR")) {
+            message.channel.send(cannotUse);
+            return;
+        }
         ranks = JSON.parse(message.content.substring(8)); //doesn't parse in the command
         new Rank("C", "C", "C", "C", message); //initializes roles variable in Rank.js
         for (var i = 0; i < ranks.length; i++) {
-            ranks[i] = new Rank(ranks[i].TC, ranks[i].SZ, ranks[i].RM, ranks[i].CB, ranks[i].id);
+            ranks[i] = new Rank(ranks[i].TC, ranks[i].SZ, ranks[i].RM, ranks[i].CB, ranks[i].id, ranks[i].fc);
             var member = guild.members.find(member => member.id == ranks[i].id);
             registration(member, roles, ranks[i].role);
         }
         message.channel.send("Successfully re-registered using past data!");
+    } else if (command === 'fc') {
+        var str;
+        var ind = ranks.findIndex(rank => rank.id == message.member.id);
+        if (ind == -1) {
+            message.channel.send("You must register first!\n"
+                + "If you had previously registered and are getting this error, ping @Straw or @leonidasxlii.");
+            return;
+        }
+        if (args.length == 0) {
+            if (ranks[ind].fc == undefined) {
+                message.channel.send("You haven't set your fc yet! Set your fc with !!fc [your fc]");
+                return;
+            } else {
+                message.channel.send("Your fc: " + ranks[ind].fc);
+            }
+        } else if (args.length == 1) {
+            var member = message.mentions.members.first();
+            if (member == undefined) {
+                var str = checkFC(args[0]);
+                if (!str.includes("not valid")) {
+                    ranks[ind].fc = args[0];
+                }
+                message.channel.send(str);
+                return;
+            }
+            if (member == message.member) {
+                if (ranks[ind].fc != undefined) {
+                    if (ranks[ind].ask) {
+                        message.channel.send("You need to specify your new fc!");
+                    } else {
+                        message.channel.send("Are you sure you want to overwrite your existing fc? Enter the command again with your new fc to proceed.");
+                        ranks[ind].ask = !ranks[ind].ask;
+                    }
+                } else {
+                    message.channel.send("You need to specify an fc.");
+                }
+            } else {
+                ind = ranks.findIndex(rank => rank.id == member.id);
+                if (ind == -1) {
+                    message.channel.send("That member hasn't registered yet!");
+                    return;
+                } else {
+                    if (ranks[ind].fc == undefined) {
+                        message.channel.send("That member hasn't put in their fc yet!");
+                        return;
+                    } else {
+                        message.channel.send("fc: " + ranks[ind].fc);
+                    }
+                }
+            }
+            
+        } else if (args.length == 2) {
+            var member = message.mentions.members.first();
+            if (member == undefined) {
+                message.channel.send("Invalid use of !!fc. Use !!help fc for more information.");
+                return;
+            }
+            if (member == message.member) {
+                if (ranks[ind].fc != undefined) {
+                    if (ranks[ind].ask) {
+                        str = checkFC(args[1]);
+                        if (!str.includes("not valid")) {
+                            ranks[ind].fc = args[1];
+                        }
+                        message.channel.send(str);
+                        return;
+                    } else {
+                        message.channel.send("Are you sure you want to overwrite your existing fc? Enter the command again to proceed.");
+                    }
+                    ranks[ind].ask = !ranks[ind].ask;
+                } else {
+                    str = checkFC(args[1]);
+                    if (!str.includes("not valid")) {
+                        ranks[ind].fc = args[1];
+                    }
+                    message.channel.send(str);
+                    return;
+                }
+            } else {
+                message.channel.send("Invalid use of !!fc. Use !!help fc for more information.");
+                return;
+            }
+        } else {
+            message.channel.send("Invalid use of !!fc. Use !!help fc for more information.");
+        }
     } else message.channel.send("I do not recognize that command!");
 });
 

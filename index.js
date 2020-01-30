@@ -8,6 +8,7 @@ const timeout = 10000;
 var Rank = require('./Rank.js');
 //Array for saving ranks
 var ranks = [];
+var turnitoff = false;
 
 var guild, freshman, sophomore, junior, senior, visitor, teacher, offline, student;
 
@@ -28,6 +29,9 @@ app.get('/', function(request, response) {
 process.on('SIGINT', shutdown)
 
 function shutdown() {
+    if (turnitoff) {
+        process.exit(0);
+    }
     if (guild == undefined) {
         console.log("BOT HAS FAILED");
         process.exit(0);
@@ -38,6 +42,7 @@ function shutdown() {
         arr.push({TC: ranks[i].TC, SZ: ranks[i].SZ, RM: ranks[i].RM, CB: ranks[i].CB, id: ranks[i].id, fc: ranks[i].fc});
     }
     channel.send(JSON.stringify(arr));
+    turnitoff = true;
 }
 
 client.on('ready', () => {
@@ -109,8 +114,12 @@ deleteMessages = (message) => {
  * @return the message that should be sent, depending on if the fc is valid or not
  */
 checkFC = (fc) => {
-    if (true) {
-        return fc;
+    var x = fc.match("[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]")
+        || fc.match("[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]")
+        || fc.match("SW-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]")
+        || fc.match("SW[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]")
+    if (x) {
+        return "Your FC is: " + fc;
     } else {
         return "Your FC is not valid! It should be in the format ####-####-####, or similar";
     }
@@ -269,13 +278,8 @@ client.on('message', message => {
         } 
         var role = guild.roles.find(ele => ele.name === args[0].toUpperCase())
         if (role != undefined) {
-<<<<<<< HEAD
             if (roleArr.findIndex(ele => ele === args[0].toUpperCase()) == -1) {
-=======
-            if (role != "SW" && "LFG" && "NA" && "EU") {
->>>>>>> 3bc8dd55511b6c3fecc5edd5e6af9c37b4dc2abc
                 message.channel.send("I'm sorry! You cannot use that role!");
-                return;
             }
             if (message.member.roles.find(ele => ele.name === role.name)) {
                 message.member.removeRole(role);
@@ -284,14 +288,14 @@ client.on('message', message => {
                 message.member.addRole(role);
                 message.channel.send(`Successfully added the role ${role.name}!`)
             }
-            deleteMessages(message);
         }
         else message.channel.send("That is not a role!");
+        deleteMessages(message);
     } else if (command === 'start') {
-        if (!message.member.hasPermission("ADMINISTRATOR")) {
-            message.channel.send(cannotUse);
-            return;
-        }
+        // if (!message.member.hasPermission("ADMINISTRATOR")) {
+        //     message.channel.send(cannotUse);
+        //     return;
+        // }
         ranks = JSON.parse(message.content.substring(8)); //doesn't parse in the command
         new Rank("C", "C", "C", "C", message); //initializes roles variable in Rank.js
         for (var i = 0; i < ranks.length; i++) {
@@ -365,7 +369,6 @@ client.on('message', message => {
                             ranks[ind].fc = args[1];
                         }
                         message.channel.send(str);
-                        return;
                     } else {
                         message.channel.send("Are you sure you want to overwrite your existing fc? Enter the command again to proceed.");
                     }

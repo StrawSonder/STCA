@@ -253,10 +253,15 @@ client.on('message', message => {
         message.channel.send(greeting + "Your " + args[0].toUpperCase() + " rank is now " + args[1].toUpperCase() + "." + add);
     } else if (command === 'help') {
         if (args[0] == undefined) {
-            message.channel.send('If you are a student and would like to register, use !!register\n If you would like to add a role, use !!role\n If you do not know how to use these commands, use !!help (command)')
+            message.channel.send('Available commands:\n'
+                + '!!register       register if you are a student'
+                + '!!fc             update your friend code, check your friend code, or check others\' friend codes'
+                + '!!role           add or remove a role; use !!help role to see the list'
+                + '!!update         update the rank of a specific mode'
+                + 'If you do not know how to use these commands, use !!help (command)');
         } else if (args[0].toLowerCase() == "register") {
             message.channel.send("To register as a student, use !!register [TC] [SZ] [RM] [CB]\n"
-            + "ex. !!register C+ B- A S+7")
+            + "ex. !!register C+ B- A S+7");
         } else if (args[0].toLowerCase() == "role") {
             message.channel.send("To add or remove a role, use !!role\n\nHere are the roles you can choose from:\n" +
             "LFG (If you are interested in being pinged for people looking for game)\n" +

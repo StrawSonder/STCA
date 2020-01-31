@@ -254,10 +254,10 @@ client.on('message', message => {
     } else if (command === 'help') {
         if (args[0] == undefined) {
             message.channel.send('Available commands:\n'
-                + '!!register       register if you are a student'
-                + '!!fc             update your friend code, check your friend code, or check others\' friend codes'
-                + '!!role           add or remove a role; use !!help role to see the list'
-                + '!!update         update the rank of a specific mode'
+                + '!!register       register if you are a student\n'
+                + '!!fc             update your friend code, check your friend code, or check others\' friend codes\n'
+                + '!!role           add or remove a role; use !!help role to see the list\n'
+                + '!!update         update the rank of a specific mode\n'
                 + 'If you do not know how to use these commands, use !!help (command)');
         } else if (args[0].toLowerCase() == "register") {
             message.channel.send("To register as a student, use !!register [TC] [SZ] [RM] [CB]\n"

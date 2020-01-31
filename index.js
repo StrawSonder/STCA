@@ -36,7 +36,7 @@ function shutdown() {
         console.log("BOT HAS FAILED");
         process.exit(0);
     }
-    var channel = guild.channels.get('670054185764519952');
+    var channel = guild.channels.get('667901183909953569');
     var arr = [];
     for (var i = 0; i < ranks.length; i++) {
         arr.push({TC: ranks[i].TC, SZ: ranks[i].SZ, RM: ranks[i].RM, CB: ranks[i].CB, id: ranks[i].id, fc: ranks[i].fc});
@@ -47,7 +47,7 @@ function shutdown() {
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    guild = client.guilds.get('665396787963625491');
+    guild = client.guilds.get('667901183909953565');
     freshman = guild.roles.find(role => role.name === "Freshman");
     sophomore = guild.roles.find(role => role.name === "Sophomore");
     junior = guild.roles.find(role => role.name === "Junior");
@@ -65,15 +65,18 @@ client.on('ready', () => {
  */
 client.on('guildMemberAdd', (guildMember) => {
     guildMember.addRole(guildMember.guild.roles.find(role => role.name === "Visitor"));
-    console.log(`${guildMember.user.tag} has gotten the visitor role.`);
-    guildMember.guild.channels.get('667773048732254244').send(`Welcome to the STCA, <@` + guildMember.id + `>! If you are a student, head over to #registration !`); 
+    guildMember.guild.channels.get('667901183909953569').send(`Welcome to the STCA, <@` + guildMember.id + `>! If you are a student, head over to #registration !`); 
 })
 
 /**
  * When user leaves, sends leaving message
  */
 client.on('guildMemberRemove', member => {
-    member.guild.channels.get('667773048732254244').send(`${member.user.tag} just left the server!`); 
+    member.guild.channels.get('667901183909953569').send(`${member.user.tag} just left the server!`);
+    var ind = ranks.findIndex(ele => ele.id == member.id);
+    if (ind != -1) {
+        ranks.splice(ind, 1);
+    } 
 });
 
 /**
@@ -114,12 +117,9 @@ deleteMessages = (message) => {
  * @return the message that should be sent, depending on if the fc is valid or not
  */
 checkFC = (fc) => {
-    var x = fc.match("[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]")
-        || fc.match("[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]")
-        || fc.match("SW-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]")
-        || fc.match("SW[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]")
-    if (x) {
-        return "Your FC is: " + fc;
+    fc = fc.replace(/[^0-9\/]+/g, "");
+    if (fc.length == 12) {
+        return "Your FC is: " + fc.substring(0, 4) + "-" + fc.substring(4, 8) + "-" + fc.substring(8);
     } else {
         return "Your FC is not valid! It should be in the format ####-####-####, or similar";
     }
@@ -158,10 +158,6 @@ client.on('message', message => {
             possessive = member.user.username + "'s";
         //anyone can register themselves
         } else if (args.length == 4) {
-            if (message.member.roles.find(role => role.name === "Teacher") || message.member.roles.find(role => role.name === "Offline Teacher")) {
-                message.channel.send("You're a teacher, not a student! You don't need to register!");
-                return;
-            } 
             arr = args;
             name = "You are";
             possessive = "Your";
@@ -185,6 +181,11 @@ client.on('message', message => {
         //if valid rank and not reregistration, add it to the array
         if (ind == -1) ranks.push(rank);
         else ranks[ind] = rank;
+        if (message.member.roles.find(role => role.name === "Teacher") || message.member.roles.find(role => role.name === "Offline Teacher")) {
+            message.channel.send(greeting + possessive + " ranks are "
+            + arr[0] + " for tower control, " + arr[1] + " for splat zones, "
+            + arr[2] + " for rainmaker, and " + arr[3] + " for clam blitz.\n");
+        } 
         registration(message.member, roles, rank.role);
         message.channel.send(greeting + possessive + " ranks are "
             + arr[0] + " for tower control, " + arr[1] + " for splat zones, "
@@ -230,8 +231,7 @@ client.on('message', message => {
         //finds the rank object associated with the user
         var ind = ranks.findIndex(rank => rank.id == message.member.id);
         if (ind == -1) {
-            message.channel.send("You must register first!\n"
-                + "If you had previously registered and are getting this error, ping @Straw or @leonidasxlii.");
+            message.channel.send("You must register first!");
             return;
         }
         //sets the specific rank
@@ -313,8 +313,7 @@ client.on('message', message => {
         var str;
         var ind = ranks.findIndex(rank => rank.id == message.member.id);
         if (ind == -1) {
-            message.channel.send("You must register first!\n"
-                + "If you had previously registered and are getting this error, ping @Straw or @leonidasxlii.");
+            message.channel.send("You must register first!");
             return;
         }
         if (args.length == 0) {
@@ -327,11 +326,16 @@ client.on('message', message => {
         } else if (args.length == 1) {
             var member = message.mentions.members.first();
             if (member == undefined) {
-                var str = checkFC(args[0]);
-                if (!str.includes("not valid")) {
-                    ranks[ind].fc = args[0];
+                if (ranks[ind].fc == undefined) {
+                    var str = checkFC(args[0]);
+                    if (!str.includes("not valid")) {
+                        ranks[ind].fc = str.split(/:+/)[0].substring(1);
+                    }
+                    message.channel.send(str);
+                } else {
+                    message.channel.send("Are you sure you want to overwrite your existing fc? Please run the command with a self-mention if you are sure.");
+                    ranks[ind].ask = true;
                 }
-                message.channel.send(str);
                 return;
             }
             if (member == message.member) {
@@ -349,11 +353,9 @@ client.on('message', message => {
                 ind = ranks.findIndex(rank => rank.id == member.id);
                 if (ind == -1) {
                     message.channel.send("That member hasn't registered yet!");
-                    return;
                 } else {
                     if (ranks[ind].fc == undefined) {
                         message.channel.send("That member hasn't put in their fc yet!");
-                        return;
                     } else {
                         message.channel.send("fc: " + ranks[ind].fc);
                     }
@@ -371,7 +373,7 @@ client.on('message', message => {
                     if (ranks[ind].ask) {
                         str = checkFC(args[1]);
                         if (!str.includes("not valid")) {
-                            ranks[ind].fc = args[1];
+                            ranks[ind].fc = str.split(/:+/)[0].substring(1);
                         }
                         message.channel.send(str);
                     } else {
@@ -381,18 +383,25 @@ client.on('message', message => {
                 } else {
                     str = checkFC(args[1]);
                     if (!str.includes("not valid")) {
-                        ranks[ind].fc = args[1];
+                        ranks[ind].fc = str.split(/:+/)[0].substring(1);
                     }
                     message.channel.send(str);
-                    return;
                 }
             } else {
                 message.channel.send("Invalid use of !!fc. Use !!help fc for more information.");
-                return;
             }
         } else {
             message.channel.send("Invalid use of !!fc. Use !!help fc for more information.");
         }
+    } else if (command === 'view') {
+        var ind = ranks.findIndex(rank => rank.id == message.member.id);
+        if (ind == -1) {
+            message.channel.send("You must register first!");
+            return;
+        }
+        message.channel.send("Your ranks are "
+        + ranks[ind].TC + " for tower control, " + ranks[ind].SZ + " for splat zones, "
+        + ranks[ind].RM + " for rainmaker, and " + ranks[ind].CB + " for clam blitz.\n");
     } else message.channel.send("I do not recognize that command!");
 });
 

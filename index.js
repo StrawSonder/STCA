@@ -36,7 +36,7 @@ function shutdown() {
         console.log("BOT HAS FAILED");
         process.exit(0);
     }
-    var channel = guild.channels.get('667901183909953569');
+    var channel = guild.channels.get('670054185764519952');
     var arr = [];
     for (var i = 0; i < ranks.length; i++) {
         arr.push({TC: ranks[i].TC, SZ: ranks[i].SZ, RM: ranks[i].RM, CB: ranks[i].CB, id: ranks[i].id, fc: ranks[i].fc});
@@ -47,7 +47,7 @@ function shutdown() {
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    guild = client.guilds.get('667901183909953565');
+    guild = client.guilds.get('665396787963625491');
     freshman = guild.roles.find(role => role.name === "Freshman");
     sophomore = guild.roles.find(role => role.name === "Sophomore");
     junior = guild.roles.find(role => role.name === "Junior");
@@ -65,14 +65,14 @@ client.on('ready', () => {
  */
 client.on('guildMemberAdd', (guildMember) => {
     guildMember.addRole(guildMember.guild.roles.find(role => role.name === "Visitor"));
-    guildMember.guild.channels.get('667901183909953569').send(`Welcome to the STCA, <@` + guildMember.id + `>! If you are a student, head over to #registration !`); 
+    guildMember.guild.channels.get('667773048732254244').send(`Welcome to the STCA, <@` + guildMember.id + `>! If you are a student, head over to #registration !`); 
 })
 
 /**
  * When user leaves, sends leaving message
  */
 client.on('guildMemberRemove', member => {
-    member.guild.channels.get('667901183909953569').send(`${member.user.tag} just left the server!`);
+    member.guild.channels.get('667773048732254244').send(`${member.user.tag} just left the server!`);
     var ind = ranks.findIndex(ele => ele.id == member.id);
     if (ind != -1) {
         ranks.splice(ind, 1);
@@ -121,7 +121,7 @@ checkFC = (fc) => {
     if (fc.length == 12) {
         return "Your FC is: " + fc.substring(0, 4) + "-" + fc.substring(4, 8) + "-" + fc.substring(8);
     } else {
-        return "Your FC is not valid! It should be in the format ####-####-####, or similar";
+        return "Your FC is not valid! It should have 12 digits, like ####-####-####, or similar";
     }
 }
 

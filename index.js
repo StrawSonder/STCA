@@ -29,25 +29,28 @@ app.get('/', function(request, response) {
 process.on('SIGINT', shutdown)
 
 function shutdown() {
-    if (turnitoff) {
-        process.exit(0);
-    }
     if (guild == undefined) {
         console.log("BOT HAS FAILED");
         process.exit(0);
     }
-    var channel = guild.channels.get('670054185764519952');
+    var channel = guild.channels.get('667901183909953569');
+    //test: 667901183909953569
+    //main: 670054185764519952
     var arr = [];
     for (var i = 0; i < ranks.length; i++) {
         arr.push({TC: ranks[i].TC, SZ: ranks[i].SZ, RM: ranks[i].RM, CB: ranks[i].CB, id: ranks[i].id, fc: ranks[i].fc});
     }
     channel.send(JSON.stringify(arr));
-    turnitoff = true;
+    setTimeout(() => {
+        process.exit(0);
+      }, 5000).unref();
 }
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    guild = client.guilds.get('665396787963625491');
+    guild = client.guilds.get('667901183909953565');
+    //main 665396787963625491
+    //test 667901183909953565
     freshman = guild.roles.find(role => role.name === "Freshman");
     sophomore = guild.roles.find(role => role.name === "Sophomore");
     junior = guild.roles.find(role => role.name === "Junior");
@@ -65,14 +68,18 @@ client.on('ready', () => {
  */
 client.on('guildMemberAdd', (guildMember) => {
     guildMember.addRole(guildMember.guild.roles.find(role => role.name === "Visitor"));
-    guildMember.guild.channels.get('667773048732254244').send(`Welcome to the STCA, <@` + guildMember.id + `>! If you are a student, head over to #registration !`); 
+    guildMember.guild.channels.get('667901183909953569').send(`Welcome to the STCA, <@` + guildMember.id + `>! If you are a student, head over to #registration !`); 
+    //main 667773048732254244
+    //test 667901183909953569
 })
 
 /**
  * When user leaves, sends leaving message
  */
 client.on('guildMemberRemove', member => {
-    member.guild.channels.get('667773048732254244').send(`${member.user.tag} just left the server!`);
+    member.guild.channels.get('667901183909953569').send(`${member.user.tag} just left the server!`);
+    //main 667773048732254244
+    //test 667901183909953569
     var ind = ranks.findIndex(ele => ele.id == member.id);
     if (ind != -1) {
         ranks.splice(ind, 1);
@@ -137,7 +144,7 @@ client.on('message', message => {
     const greeting = "Hello! I am the STCA\'s receptionist.\n";
     const args = message.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
-    const roleArr = ["NA", "EU", "JP", "SW", "LFG"];
+    const roleArr = ["NA", "EU", "JP", "SW", "LFG", "Frontline", "Midline", "Backline", "Support"];
 
     /**
      * Registration command
@@ -185,6 +192,7 @@ client.on('message', message => {
             message.channel.send(greeting + possessive + " ranks are "
             + arr[0] + " for tower control, " + arr[1] + " for splat zones, "
             + arr[2] + " for rainmaker, and " + arr[3] + " for clam blitz.\n");
+            return;
         } 
         registration(message.member, roles, rank.role);
         message.channel.send(greeting + possessive + " ranks are "
@@ -263,12 +271,13 @@ client.on('message', message => {
             message.channel.send("To register as a student, use !!register [TC] [SZ] [RM] [CB]\n"
             + "ex. !!register C+ B- A S+7");
         } else if (args[0].toLowerCase() == "role") {
-            message.channel.send("To add or remove a role, use !!role\n\nHere are the roles you can choose from:\n" +
-            "LFG (If you are interested in being pinged for people looking for game)\n" +
-            "NA (If you are in the NA timezone)\n" +
-            "EU (If you are in the EU timezone)\n" +
-            "JP (If you are in the JP timezone)\n" +
-            "SW (Stands for 'Stream Watcher,' for if you would like to watch peoples' streams!)")
+            message.channel.send("To add or remove a role, use !!role\n\nHere are the roles you can choose from:\n"
+                + "LFG (If you are interested in being pinged for people looking for game)\n"
+                + "NA (If you are in the NA timezone)\n"
+                + "EU (If you are in the EU timezone)\n"
+                + "JP (If you are in the JP timezone)\n"
+                + "SW (Stands for 'Stream Watcher,' for if you would like to watch peoples' streams!)"
+                + "Frontline\n" + "Midline\n" + "Backline\n"+ "Support");
         } else if (args[0].toLowerCase() == "fc") {
             message.channel.send("To add your own fc, use !!fc [your fc]\nTo get your fc, use !!fc\nTo get someone else's fc, use !!fc @[member]\n"
                 + "If you need to change your fc, use !!fc @[yourself] [updated fc]");
@@ -278,7 +287,7 @@ client.on('message', message => {
         } else message.channel.send("I cannot help with that, I'm sorry!");
     } else if (command === 'role') {
         if (args.length != 1) {
-            message.channel.send("Please type the role you would like to add or remove!")
+            message.channel.send("Invalid use. Please type the role you would like to add or remove!")
             return;
         } 
         var role = guild.roles.find(ele => ele.name === args[0].toUpperCase())
@@ -293,8 +302,7 @@ client.on('message', message => {
                 message.member.addRole(role);
                 message.channel.send(`Successfully added the role ${role.name}!`)
             }
-        }
-        else message.channel.send("That is not a role!");
+        } else message.channel.send("That is not a role!");
         deleteMessages(message);
     } else if (command === 'start') {
         // if (!message.member.hasPermission("ADMINISTRATOR")) {
@@ -329,7 +337,7 @@ client.on('message', message => {
                 if (ranks[ind].fc == undefined) {
                     var str = checkFC(args[0]);
                     if (!str.includes("not valid")) {
-                        ranks[ind].fc = str.split(/:+/)[0].substring(1);
+                        ranks[ind].fc = str.split(/:+/)[1].substring(1);
                     }
                     message.channel.send(str);
                 } else {
@@ -373,7 +381,7 @@ client.on('message', message => {
                     if (ranks[ind].ask) {
                         str = checkFC(args[1]);
                         if (!str.includes("not valid")) {
-                            ranks[ind].fc = str.split(/:+/)[0].substring(1);
+                            ranks[ind].fc = str.split(/:+/)[1].substring(1);
                         }
                         message.channel.send(str);
                     } else {
@@ -383,7 +391,7 @@ client.on('message', message => {
                 } else {
                     str = checkFC(args[1]);
                     if (!str.includes("not valid")) {
-                        ranks[ind].fc = str.split(/:+/)[0].substring(1);
+                        ranks[ind].fc = str.split(/:+/)[1].substring(1);
                     }
                     message.channel.send(str);
                 }

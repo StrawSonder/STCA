@@ -33,7 +33,7 @@ function shutdown() {
         console.log("BOT HAS FAILED");
         process.exit(0);
     }
-    var channel = guild.channels.get('667901183909953569');
+    var channel = guild.channels.get('670054185764519952');
     //test: 667901183909953569
     //main: 670054185764519952
     var arr = [];
@@ -48,7 +48,7 @@ function shutdown() {
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    guild = client.guilds.get('667901183909953565');
+    guild = client.guilds.get('665396787963625491');
     //main 665396787963625491
     //test 667901183909953565
     freshman = guild.roles.find(role => role.name === "Freshman");
@@ -68,7 +68,7 @@ client.on('ready', () => {
  */
 client.on('guildMemberAdd', (guildMember) => {
     guildMember.addRole(guildMember.guild.roles.find(role => role.name === "Visitor"));
-    guildMember.guild.channels.get('667901183909953569').send(`Welcome to the STCA, <@` + guildMember.id + `>! If you are a student, head over to #registration !`); 
+    guildMember.guild.channels.get('667773048732254244').send(`Welcome to the STCA, <@` + guildMember.id + `>! If you are a student, head over to #registration !`); 
     //main 667773048732254244
     //test 667901183909953569
 })
@@ -77,7 +77,7 @@ client.on('guildMemberAdd', (guildMember) => {
  * When user leaves, sends leaving message
  */
 client.on('guildMemberRemove', member => {
-    member.guild.channels.get('667901183909953569').send(`${member.user.tag} just left the server!`);
+    member.guild.channels.get('667773048732254244').send(`${member.user.tag} just left the server!`);
     //main 667773048732254244
     //test 667901183909953569
     var ind = ranks.findIndex(ele => ele.id == member.id);
@@ -305,10 +305,10 @@ client.on('message', message => {
         } else message.channel.send("That is not a role!");
         deleteMessages(message);
     } else if (command === 'start') {
-        // if (!message.member.hasPermission("ADMINISTRATOR")) {
-        //     message.channel.send(cannotUse);
-        //     return;
-        // }
+        if (!message.member.hasPermission("ADMINISTRATOR")) {
+            message.channel.send(cannotUse);
+            return;
+        }
         ranks = JSON.parse(message.content.substring(8)); //doesn't parse in the command
         new Rank("C", "C", "C", "C", message); //initializes roles variable in Rank.js
         for (var i = 0; i < ranks.length; i++) {

@@ -1,6 +1,6 @@
-*.json
 
 ### General ###
+node_modules/
 results/
 temp/
 test/
@@ -9,6 +9,7 @@ test/
 \#*\#
 .\#*
 *.swp
+.vscode
 
 ### Java ###
 *.class

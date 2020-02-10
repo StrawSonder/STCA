@@ -1,0 +1,22 @@
+{
+  "name": "stca-discord-bot",
+  "description": "my discord bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ."
+  },
+  "dependencies": {
+    "ascii-table": "0.0.9",
+    "bufferutil": "^4.0.1",
+    "cryptiles": "^4.1.3",
+    "discord.js": "11.5.1",
+    "erlpack": "github:discordapp/erlpack",
+    "express": "^4.17.1",
+    "libsodium-wrappers": "^0.7.6",
+    "mongoose": "^5.8.11",
+    "opusscript": "0.0.7",
+    "pnpm": "^4.9.3",
+    "request": "2.81.0"
+  }
+}

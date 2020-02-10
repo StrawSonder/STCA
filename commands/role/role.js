@@ -11,8 +11,7 @@ module.exports = {
         if (role != undefined) {
             if (roleArr.findIndex(ele => ele.toLowerCase() === args[0].toLowerCase()) == -1) {
                 message.channel.send("I'm sorry! You cannot use that role!");
-            }
-            if (message.member.roles.find(ele => ele.name === role.name)) {
+            } else if (message.member.roles.find(ele => ele.name === role.name)) {
                 message.member.removeRole(role);
                 message.channel.send(`Successfully removed the role ${role.name}!`)
             } else {

@@ -24,5 +24,6 @@ module.exports = (client) => {
             }
         }
     });
+    // uncomment if you want to see the table that shows the commands and their load statuses
     console.log(table.toString());
 }

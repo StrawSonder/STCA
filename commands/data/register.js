@@ -1,7 +1,11 @@
 const Ranks = require("../../models/ranks.js");
 const mongoose = require("mongoose");
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/Ranks');
+mongoose.set('useUnifiedTopology', true);
+mongoose.connect("mongodb://lzhang11:Ny5d6fTYra3CUT82@cluster0-shard-00-00-07nkg.mongodb.net:27017,"
+    + "cluster0-shard-00-02-07nkg.mongodb.net:27017,"
+    + "cluster0-shard-00-01-07nkg.mongodb.net:27017/Ranks?replicaSet=Cluster0-shard-0&ssl=true&authSource=admin"
+    , {useNewUrlParser: true});
 
 /**
  * Adds new class (freshman, sophomore, etc.) role to user
@@ -15,7 +19,9 @@ registration = (member, arr, add) => {
         if (arr[i].name.toLowerCase() === add.toLowerCase()) {
             member.addRole(arr[i]);
         } else {
-            member.removeRole(arr[i]);
+            if (member.roles.find(role => role.name === arr[i].name)) {
+                member.removeRole(arr[i]);
+            }
         }
     }
 }
@@ -64,7 +70,7 @@ module.exports = {
     name: "register",
     description: "Adds data to database, gives class role",
     run: async (client, message, args) => {
-        var arr, member, name, possessive;
+        var arr, member, username, possessive;
         var freshman = message.guild.roles.find(role => role.name === "Freshman");
         var sophomore = message.guild.roles.find(role => role.name === "Sophomore");
         var junior = message.guild.roles.find(role => role.name === "Junior");
@@ -80,28 +86,33 @@ module.exports = {
                 message.channel.send("You need to mention someone if you're trying to give someone else a class!");
                 return;
             }
-            name = member.user.username + " is";
+            username = member.user.username + " is";
             possessive = member.user.username + "'s";
         //anyone can register themselves
         } else if (args.length == 4) {
             arr = args;
-            name = "You are";
+            username = "You are";
             possessive = "Your";
         } else {
-            message.channel.send(rankings);
+            message.channel.send("Those are not correct rankings! Correct usage is:\n!!register [TC] [SZ] [RM] [CB]\nex. !!register C B A S");
             return;
         }
         
         //arr is the array of ranks: [TC], [SZ], [RM], [CB]
-        if (args.length == 5) arr = args.slice(1);
-        for (var i = 0; i < 4; i++) arr[i] = arr[i].toUpperCase();
-        var total = 0;
-        for (var i = 0; i < 4; i++) total += checkRank(arr[i]);
-        var name;
-        if (total < 10 ) name = "Freshman";
-        else if (total < 20) name = "Sophomore";
-        else if (total < 30) name = "Junior";
-        else name = "Senior";
+        try {
+            if (args.length == 5) arr = args.slice(1);
+            for (var i = 0; i < 4; i++) arr[i] = arr[i].toUpperCase();
+            var total = 0;
+            for (var i = 0; i < 4; i++) total += checkRank(arr[i]);
+            var name;
+            if (total < 10 ) name = "Freshman";
+            else if (total < 20) name = "Sophomore";
+            else if (total < 30) name = "Junior";
+            else name = "Senior";
+        } catch (err) {
+            message.channel.send(err);
+            return;
+        }
 
         Ranks.findOne({userID: message.member.user.id},
             (err, ranks) => {
@@ -134,7 +145,7 @@ module.exports = {
                     message.channel.send(possessive + " ranks are "
                         + arr[0] + " for tower control, " + arr[1] + " for splat zones, "
                         + arr[2] + " for rainmaker, and " + arr[3] + " for clam blitz.\n"
-                        + name + ` now a ${rank.role.name} of the academy!`);
+                        + username + ` now a ${name} of the academy!`);
                     message.member.addRole(student);
                 }
             });

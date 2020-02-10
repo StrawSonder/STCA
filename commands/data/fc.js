@@ -1,3 +1,12 @@
+const Ranks = require("../../models/ranks.js");
+const mongoose = require("mongoose");
+mongoose.Promise = global.Promise;
+mongoose.set('useUnifiedTopology', true);
+mongoose.connect("mongodb://lzhang11:Ny5d6fTYra3CUT82@cluster0-shard-00-00-07nkg.mongodb.net:27017,"
+    + "cluster0-shard-00-02-07nkg.mongodb.net:27017,"
+    + "cluster0-shard-00-01-07nkg.mongodb.net:27017/Ranks?replicaSet=Cluster0-shard-0&ssl=true&authSource=admin"
+    , {useNewUrlParser: true});
+
 /**
  * Checks the fc to see if it is valid (in the right format)
  * @param fc the friend code to be checked
@@ -12,89 +21,82 @@ checkFC = (fc) => {
     }
 }
 
+/**
+ * Checks the ranks to see if the member has registered or put in an fc yet
+ * @param message original sent message
+ * @param ranks variable containing information about the member
+ * @param member the member to be checked
+ */
+checkRegister = (message, ranks, member) => {
+    if (!ranks) {
+        message.channel.send(member.user.username + " has not registered yet!");
+        return;
+    }
+    if (ranks.fc == "") {
+        message.channel.send(member.user.username + " has not added their fc yet!");
+    } else {
+        message.channel.send(checkFC(ranks.fc));
+    }
+}
+
 module.exports = {
     name: "fc",
     description: "Updates friend code for a user",
     run: async (client, message, args) => {
         var str;
-        var ind = ranks.findIndex(rank => rank.id == message.member.id);
-        if (ind == -1) {
-            message.channel.send("You must register first!");
-            return;
-        }
         if (args.length == 0) {
-            if (ranks[ind].fc == undefined) {
-                message.channel.send("You haven't set your fc yet! Set your fc with !!fc [your fc]");
-                return;
-            } else {
-                message.channel.send("Your fc: " + ranks[ind].fc);
-            }
+            Ranks.findOne({userID: message.member.user.id},
+                (err, ranks) => {
+                    checkRegister(message, ranks, message.member);
+                });
         } else if (args.length == 1) {
             var member = message.mentions.members.first();
             if (member == undefined) {
-                if (ranks[ind].fc == undefined) {
-                    var str = checkFC(args[0]);
-                    if (!str.includes("not valid")) {
-                        ranks[ind].fc = str.split(/:+/)[1].substring(1);
-                    }
-                    message.channel.send(str);
+                var member = message.guild.members.find(member => member.user.username === args[0]);
+                if (member) {
+                    Ranks.findOne({userID: member.user.id},
+                        (err, ranks) => {
+                            checkRegister(message, ranks, member);
+                        });
                 } else {
-                    message.channel.send("Are you sure you want to overwrite your existing fc? Please run the command with a self-mention if you are sure.");
-                    ranks[ind].ask = true;
-                }
-                return;
-            }
-            if (member == message.member) {
-                if (ranks[ind].fc != undefined) {
-                    if (ranks[ind].ask) {
-                        message.channel.send("You need to specify your new fc!");
+                    str = checkFC(args[0]);
+                    if (str.includes("not")) {
+                        message.channel.send(args[0] + " is an invalid user or an invalid fc.");
                     } else {
-                        message.channel.send("Are you sure you want to overwrite your existing fc? Enter the command again with your new fc to proceed.");
-                        ranks[ind].ask = !ranks[ind].ask;
+                        Ranks.findOne({userID: message.member.user.id},
+                            (err, ranks) => {
+                                if (!ranks) {
+                                    message.channel.send("You must register first!");
+                                } else {
+                                    ranks.fc = str.substring(12); //cuts out "Your fc is: "
+                                    message.channel.send(str);
+                                    ranks.save().catch(err => console.log(err));
+                                }
+                            });
                     }
-                } else {
-                    message.channel.send("You need to specify an fc.");
                 }
             } else {
-                ind = ranks.findIndex(rank => rank.id == member.id);
-                if (ind == -1) {
-                    message.channel.send("That member hasn't registered yet!");
-                } else {
-                    if (ranks[ind].fc == undefined) {
-                        message.channel.send("That member hasn't put in their fc yet!");
-                    } else {
-                        message.channel.send("fc: " + ranks[ind].fc);
-                    }
-                }
+                Ranks.findOne({userID: member.user.id},
+                    (err, ranks) => {
+                        checkRegister(message, ranks, member);
+                    });
             }
-            
-        } else if (args.length == 2) {
-            var member = message.mentions.members.first();
-            if (member == undefined) {
-                message.channel.send("Invalid use of !!fc. Use !!help fc for more information.");
-                return;
-            }
-            if (member == message.member) {
-                if (ranks[ind].fc != undefined) {
-                    if (ranks[ind].ask) {
-                        str = checkFC(args[1]);
-                        if (!str.includes("not valid")) {
-                            ranks[ind].fc = str.split(/:+/)[1].substring(1);
+        } else if (args.length == 3) {
+            var str = checkFC(args[0] + args[1] + args[2]);
+            if (str.includes("not")) {
+                message.channel.send(str);
+            } else {
+                Ranks.findOne({userID: message.member.user.id},
+                    (err, ranks) => {
+                        if (!ranks) {
+                            message.channel.send(member.user.username + " has not registered yet!");
+                            return;
+                        } else {
+                            ranks.fc = str.substring(12);
+                            message.channel.send(str);
+                            ranks.save().catch(err => console.log(err));
                         }
-                        message.channel.send(str);
-                    } else {
-                        message.channel.send("Are you sure you want to overwrite your existing fc? Enter the command again to proceed.");
-                    }
-                    ranks[ind].ask = !ranks[ind].ask;
-                } else {
-                    str = checkFC(args[1]);
-                    if (!str.includes("not valid")) {
-                        ranks[ind].fc = str.split(/:+/)[1].substring(1);
-                    }
-                    message.channel.send(str);
-                }
-            } else {
-                message.channel.send("Invalid use of !!fc. Use !!help fc for more information.");
+                    });
             }
         } else {
             message.channel.send("Invalid use of !!fc. Use !!help fc for more information.");
